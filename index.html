@@ -942,7 +942,7 @@
         
         function initLocalStorage() {
             // Versioning: Clear outdated schemas from previous development sessions
-            const currentDbVersion = 'obs_static_v2';
+            const currentDbVersion = 'obs_static_v3';
             if (localStorage.getItem('obs_db_version') !== currentDbVersion) {
                 const keysToRemove = [
                     'obs_users', 
@@ -1124,7 +1124,7 @@
             const user = users.find(u => u && u.username === username && u.password === password);
             
             if (user) {
-                sessionUser = user;
+                sessionUser = Object.assign({}, user);
                 
                 // Rol detaylarını ekle
                 if (user.role === 'student') {
@@ -1133,7 +1133,7 @@
                     if (student) {
                         sessionUser.student_id = student.id;
                         sessionUser.student_number = student.student_number;
-                        sessionUser.full_name = `${student.first_name} ${student.last_name}`;
+                        sessionUser.full_name = `${student.first_name || ''} ${student.last_name || ''}`;
                         sessionUser.gpa = student.gpa;
                     }
                 } else if (user.role === 'academician') {
@@ -1141,13 +1141,20 @@
                     const teacher = teachers.find(t => t && t.user_id === user.id);
                     if (teacher) {
                         sessionUser.academician_id = teacher.id;
-                        sessionUser.full_name = `${teacher.title} ${teacher.first_name} ${teacher.last_name}`;
+                        sessionUser.full_name = `${teacher.title || ''} ${teacher.first_name || ''} ${teacher.last_name || ''}`;
                         sessionUser.department = teacher.department;
                     }
                 }
                 
-                document.getElementById('login-section').classList.add('d-none');
-                document.getElementById('main-section').classList.remove('d-none');
+                if (!sessionUser.full_name) {
+                    sessionUser.full_name = user.full_name || user.username || 'Kullanıcı';
+                }
+                
+                const loginSection = document.getElementById('login-section');
+                if (loginSection) loginSection.classList.add('d-none');
+                
+                const mainSection = document.getElementById('main-section');
+                if (mainSection) mainSection.classList.remove('d-none');
                 
                 showNotification(`Hoş geldiniz, ${sessionUser.full_name}!`, 'success');
                 
@@ -1157,23 +1164,34 @@
                 switchPage('dashboard');
             } else {
                 const errDiv = document.getElementById('login-error');
-                errDiv.innerText = 'Hatalı kullanıcı adı veya şifre!';
-                errDiv.classList.remove('d-none');
+                if (errDiv) {
+                    errDiv.innerText = 'Hatalı kullanıcı adı veya şifre!';
+                    errDiv.classList.remove('d-none');
+                }
             }
         });
 
         function logout() {
             sessionUser = null;
-            document.getElementById('main-section').classList.add('d-none');
-            document.getElementById('login-section').classList.remove('d-none');
-            document.getElementById('login-username').value = '';
-            document.getElementById('login-password').value = '';
-            document.getElementById('login-error').classList.add('d-none');
+            const mainSection = document.getElementById('main-section');
+            if (mainSection) mainSection.classList.add('d-none');
+            
+            const loginSection = document.getElementById('login-section');
+            if (loginSection) loginSection.classList.remove('d-none');
+            
+            const loginUsername = document.getElementById('login-username');
+            if (loginUsername) loginUsername.value = '';
+            
+            const loginPassword = document.getElementById('login-password');
+            if (loginPassword) loginPassword.value = '';
+            
+            const errDiv = document.getElementById('login-error');
+            if (errDiv) errDiv.classList.add('d-none');
         }
 
         function setupSidebarMenus() {
             const adminItems = document.querySelectorAll('.admin-only');
-            if (sessionUser.role === 'admin') {
+            if (sessionUser && sessionUser.role === 'admin') {
                 adminItems.forEach(item => item.classList.remove('d-none'));
             } else {
                 adminItems.forEach(item => item.classList.add('d-none'));
@@ -1181,13 +1199,25 @@
         }
 
         function updateProfileHeaders() {
-            document.getElementById('sidebar-name').innerText = sessionUser.full_name;
-            document.getElementById('sidebar-role').innerText = sessionUser.role === 'admin' ? 'Yönetici' : (sessionUser.role === 'academician' ? 'Akademisyen' : 'Öğrenci');
-            document.getElementById('sidebar-avatar').innerText = sessionUser.username.substring(0,2).toUpperCase();
+            if (!sessionUser) return;
+            const fullName = sessionUser.full_name || sessionUser.username || 'Kullanıcı';
+            const email = sessionUser.email || '';
+            const role = sessionUser.role === 'admin' ? 'Yönetici' : (sessionUser.role === 'academician' ? 'Akademisyen' : 'Öğrenci');
+            const avatar = (sessionUser.username || 'US').substring(0, 2).toUpperCase();
             
-            document.getElementById('header-name').innerText = sessionUser.full_name;
-            document.getElementById('header-email').innerText = sessionUser.email;
-            document.getElementById('header-avatar').innerText = sessionUser.username.substring(0,2).toUpperCase();
+            const sidebarName = document.getElementById('sidebar-name');
+            if (sidebarName) sidebarName.innerText = fullName;
+            const sidebarRole = document.getElementById('sidebar-role');
+            if (sidebarRole) sidebarRole.innerText = role;
+            const sidebarAvatar = document.getElementById('sidebar-avatar');
+            if (sidebarAvatar) sidebarAvatar.innerText = avatar;
+            
+            const headerName = document.getElementById('header-name');
+            if (headerName) headerName.innerText = fullName;
+            const headerEmail = document.getElementById('header-email');
+            if (headerEmail) headerEmail.innerText = email;
+            const headerAvatar = document.getElementById('header-avatar');
+            if (headerAvatar) headerAvatar.innerText = avatar;
         }
 
         function switchPage(page) {
@@ -1212,7 +1242,10 @@
                 users: 'Kullanıcı İşlemleri',
                 courses_mgmt: 'Ders Yapılandırması'
             };
-            document.getElementById('navbar-title').innerText = titles[page] || 'OBS Portal';
+            const navbarTitle = document.getElementById('navbar-title');
+            if (navbarTitle) {
+                navbarTitle.innerText = titles[page] || 'OBS Portal';
+            }
 
             // Sayfaya özel veri çekme işlemleri
             loadPageData(page);
@@ -1818,28 +1851,30 @@
         // -------------------------------------------------------------
         function switchUserTab(tab) {
             activeUserTab = tab;
-            document.querySelectorAll('#pills-tab button').forEach(b => b.classList.remove('active'));
+            const buttons = document.querySelectorAll('#pills-tab button');
+            buttons.forEach(b => b.classList.remove('active'));
             
             const table = document.getElementById('table-users-list');
             const title = document.getElementById('users-table-title');
             
             if (tab === 'students') {
-                document.querySelectorAll('#pills-tab button')[0].classList.add('active');
-                title.innerText = 'Kayıtlı Öğrenciler';
+                if (buttons[0]) buttons[0].classList.add('active');
+                if (title) title.innerText = 'Kayıtlı Öğrenciler';
                 
-                const students = JSON.parse(localStorage.getItem('obs_students'));
-                const users = JSON.parse(localStorage.getItem('obs_users'));
+                const students = JSON.parse(localStorage.getItem('obs_students')) || [];
+                const users = JSON.parse(localStorage.getItem('obs_users')) || [];
                 
                 let html = `<thead><tr><th>Öğrenci No</th><th>Kullanıcı Adı</th><th>Adı Soyadı</th><th>E-posta</th><th>GNO</th><th class="text-end">İşlem</th></tr></thead><tbody>`;
                 students.forEach(s => {
-                    const u = users.find(user => user.id === s.user_id) || {};
+                    if (!s) return;
+                    const u = users.find(user => user && user.id === s.user_id) || {};
                     html += `
                         <tr>
-                            <td><strong>${s.student_number}</strong></td>
+                            <td><strong>${s.student_number || ''}</strong></td>
                             <td>${u.username || '-'}</td>
-                            <td>${s.first_name} ${s.last_name}</td>
+                            <td>${s.first_name || ''} ${s.last_name || ''}</td>
                             <td>${u.email || '-'}</td>
-                            <td><span class="badge bg-success-light text-success">${s.gpa}</span></td>
+                            <td><span class="badge bg-success-light text-success">${s.gpa || '0.00'}</span></td>
                             <td class="text-end">
                                 <button class="btn btn-sm btn-outline-danger" onclick="deleteUser(${u.id})"><i class="fas fa-trash"></i> Sil</button>
                             </td>
@@ -1847,23 +1882,24 @@
                     `;
                 });
                 html += `</tbody>`;
-                table.innerHTML = html;
+                if (table) table.innerHTML = html;
             } else {
-                document.querySelectorAll('#pills-tab button')[1].classList.add('active');
-                title.innerText = 'Kayıtlı Akademisyenler';
+                if (buttons[1]) buttons[1].classList.add('active');
+                if (title) title.innerText = 'Kayıtlı Akademisyenler';
                 
-                const academicians = JSON.parse(localStorage.getItem('obs_academicians'));
-                const users = JSON.parse(localStorage.getItem('obs_users'));
+                const academicians = JSON.parse(localStorage.getItem('obs_academicians')) || [];
+                const users = JSON.parse(localStorage.getItem('obs_users')) || [];
                 
                 let html = `<thead><tr><th>Ünvan Adı Soyadı</th><th>Kullanıcı Adı</th><th>E-posta</th><th>Departman</th><th class="text-end">İşlem</th></tr></thead><tbody>`;
                 academicians.forEach(a => {
-                    const u = users.find(user => user.id === a.user_id) || {};
+                    if (!a) return;
+                    const u = users.find(user => user && user.id === a.user_id) || {};
                     html += `
                         <tr>
-                            <td><strong>${a.title} ${a.first_name} ${a.last_name}</strong></td>
+                            <td><strong>${a.title || ''} ${a.first_name || ''} ${a.last_name || ''}</strong></td>
                             <td>${u.username || '-'}</td>
                             <td>${u.email || '-'}</td>
-                            <td>${a.department}</td>
+                            <td>${a.department || ''}</td>
                             <td class="text-end">
                                 <button class="btn btn-sm btn-outline-danger" onclick="deleteUser(${u.id})"><i class="fas fa-trash"></i> Sil</button>
                             </td>
@@ -1871,7 +1907,7 @@
                     `;
                 });
                 html += `</tbody>`;
-                table.innerHTML = html;
+                if (table) table.innerHTML = html;
             }
         }
 
