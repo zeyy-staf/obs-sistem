@@ -941,6 +941,22 @@
         // -------------------------------------------------------------
         
         function initLocalStorage() {
+            // Versioning: Clear outdated schemas from previous development sessions
+            const currentDbVersion = 'obs_static_v2';
+            if (localStorage.getItem('obs_db_version') !== currentDbVersion) {
+                const keysToRemove = [
+                    'obs_users', 
+                    'obs_academicians', 
+                    'obs_students', 
+                    'obs_courses', 
+                    'obs_student_courses', 
+                    'obs_grades', 
+                    'obs_attendance'
+                ];
+                keysToRemove.forEach(key => localStorage.removeItem(key));
+                localStorage.setItem('obs_db_version', currentDbVersion);
+            }
+
             if (!localStorage.getItem('obs_users')) {
                 // Varsayılan Kullanıcılar (Şifreler düz metindir)
                 const users = [
@@ -1037,9 +1053,10 @@
 
             if (!localStorage.getItem('obs_grades')) {
                 const grades = [];
-                const sc = JSON.parse(localStorage.getItem('obs_student_courses'));
+                const sc = JSON.parse(localStorage.getItem('obs_student_courses')) || [];
                 
                 sc.forEach(item => {
+                    if (!item) return;
                     const midterm = Math.floor(Math.random() * 50) + 50; // 50-100 arası
                     const final = Math.floor(Math.random() * 50) + 50;
                     const project = Math.floor(Math.random() * 40) + 60;
@@ -1072,9 +1089,10 @@
 
             if (!localStorage.getItem('obs_attendance')) {
                 const attendance = [];
-                const sc = JSON.parse(localStorage.getItem('obs_student_courses'));
+                const sc = JSON.parse(localStorage.getItem('obs_student_courses')) || [];
                 
                 sc.forEach(item => {
+                    if (!item) return;
                     for (let w = 1; w <= 14; w++) {
                         // Rastgele devamsızlık ata (%10 ihtimalle absent)
                         const status = Math.random() > 0.1 ? 'Present' : 'Absent';
@@ -1102,16 +1120,16 @@
             const username = document.getElementById('login-username').value.trim();
             const password = document.getElementById('login-password').value.trim();
             
-            const users = JSON.parse(localStorage.getItem('obs_users'));
-            const user = users.find(u => u.username === username && u.password === password);
+            const users = JSON.parse(localStorage.getItem('obs_users')) || [];
+            const user = users.find(u => u && u.username === username && u.password === password);
             
             if (user) {
                 sessionUser = user;
                 
                 // Rol detaylarını ekle
                 if (user.role === 'student') {
-                    const students = JSON.parse(localStorage.getItem('obs_students'));
-                    const student = students.find(s => s.user_id === user.id);
+                    const students = JSON.parse(localStorage.getItem('obs_students')) || [];
+                    const student = students.find(s => s && s.user_id === user.id);
                     if (student) {
                         sessionUser.student_id = student.id;
                         sessionUser.student_number = student.student_number;
@@ -1119,8 +1137,8 @@
                         sessionUser.gpa = student.gpa;
                     }
                 } else if (user.role === 'academician') {
-                    const teachers = JSON.parse(localStorage.getItem('obs_academicians'));
-                    const teacher = teachers.find(t => t.user_id === user.id);
+                    const teachers = JSON.parse(localStorage.getItem('obs_academicians')) || [];
+                    const teacher = teachers.find(t => t && t.user_id === user.id);
                     if (teacher) {
                         sessionUser.academician_id = teacher.id;
                         sessionUser.full_name = `${teacher.title} ${teacher.first_name} ${teacher.last_name}`;
@@ -1213,10 +1231,10 @@
         // -------------------------------------------------------------
         
         function loadPageData(page) {
-            const students = JSON.parse(localStorage.getItem('obs_students'));
-            const academicians = JSON.parse(localStorage.getItem('obs_academicians'));
-            const courses = JSON.parse(localStorage.getItem('obs_courses'));
-            const grades = JSON.parse(localStorage.getItem('obs_grades'));
+            const students = JSON.parse(localStorage.getItem('obs_students')) || [];
+            const academicians = JSON.parse(localStorage.getItem('obs_academicians')) || [];
+            const courses = JSON.parse(localStorage.getItem('obs_courses')) || [];
+            const grades = JSON.parse(localStorage.getItem('obs_grades')) || [];
             
             if (page === 'dashboard') {
                 // İstatistik kartları
@@ -1225,23 +1243,25 @@
                 document.getElementById('stat-total-courses').innerText = courses.length;
                 
                 // Başarı Oranı
-                const passing = grades.filter(g => g.letter_grade && g.letter_grade !== 'FF' && g.letter_grade !== 'FD').length;
-                const total = grades.filter(g => g.letter_grade).length;
+                const passing = grades.filter(g => g && g.letter_grade && g.letter_grade !== 'FF' && g.letter_grade !== 'FD').length;
+                const total = grades.filter(g => g && g.letter_grade).length;
                 const pct = total > 0 ? Math.round((passing * 100 / total) * 10) / 10 : 0.0;
                 document.getElementById('stat-success-rate').innerText = `%${pct}`;
 
                 // Kişisel Panel
                 const infoBody = document.getElementById('personal-info-content');
                 if (sessionUser.role === 'student') {
-                    const mySc = JSON.parse(localStorage.getItem('obs_student_courses')).filter(item => item.student_id === sessionUser.student_id);
-                    const myAtt = JSON.parse(localStorage.getItem('obs_attendance')).filter(item => {
-                        return mySc.some(sc => sc.id === item.student_course_id) && item.status === 'Absent';
+                    const studentCoursesData = JSON.parse(localStorage.getItem('obs_student_courses')) || [];
+                    const mySc = studentCoursesData.filter(item => item && item.student_id === sessionUser.student_id);
+                    const attendanceData = JSON.parse(localStorage.getItem('obs_attendance')) || [];
+                    const myAtt = attendanceData.filter(item => {
+                        return item && mySc.some(sc => sc && sc.id === item.student_course_id) && item.status === 'Absent';
                     });
                     
                     infoBody.innerHTML = `
                         <div class="d-flex justify-content-between border-bottom pb-2">
                             <span class="text-muted">Öğrenci Numarası:</span>
-                            <span class="fw-bold">${sessionUser.student_number}</span>
+                            <span class="fw-bold">${sessionUser.student_number || '-'}</span>
                         </div>
                         <div class="d-flex justify-content-between border-bottom pb-2">
                             <span class="text-muted">Genel Not Ortalaması (GNO):</span>
@@ -1257,17 +1277,17 @@
                         </div>
                     `;
                 } else if (sessionUser.role === 'academician') {
-                    const myCourses = courses.filter(c => c.academician_id === sessionUser.academician_id);
-                    const sc = JSON.parse(localStorage.getItem('obs_student_courses'));
+                    const myCourses = courses.filter(c => c && c.academician_id === sessionUser.academician_id);
+                    const sc = JSON.parse(localStorage.getItem('obs_student_courses')) || [];
                     // Öğretmenin sorumlu olduğu toplam tekil öğrenci sayısını bul
                     const myStudentIds = new Set(
-                        sc.filter(item => myCourses.some(c => c.id === item.course_id)).map(item => item.student_id)
+                        sc.filter(item => item && myCourses.some(c => c && c.id === item.course_id)).map(item => item.student_id)
                     );
                     
                     infoBody.innerHTML = `
                         <div class="d-flex justify-content-between border-bottom pb-2">
                             <span class="text-muted">Bağlı Olduğunuz Bölüm:</span>
-                            <span class="fw-bold">${sessionUser.department}</span>
+                            <span class="fw-bold">${sessionUser.department || '-'}</span>
                         </div>
                         <div class="d-flex justify-content-between border-bottom pb-2">
                             <span class="text-muted">Verdiğiniz Toplam Ders:</span>
@@ -1297,20 +1317,22 @@
                 if (sessionUser.role === 'admin') {
                     myCourses = courses;
                 } else if (sessionUser.role === 'academician') {
-                    myCourses = courses.filter(c => c.academician_id === sessionUser.academician_id);
+                    myCourses = courses.filter(c => c && c.academician_id === sessionUser.academician_id);
                 } else {
-                    const mySc = JSON.parse(localStorage.getItem('obs_student_courses')).filter(item => item.student_id === sessionUser.student_id);
-                    myCourses = courses.filter(c => mySc.some(sc => sc.course_id === c.id));
+                    const studentCoursesData = JSON.parse(localStorage.getItem('obs_student_courses')) || [];
+                    const mySc = studentCoursesData.filter(item => item && item.student_id === sessionUser.student_id);
+                    myCourses = courses.filter(c => c && mySc.some(sc => sc && sc.course_id === c.id));
                 }
 
                 myCourses.forEach(c => {
-                    const teacher = academicians.find(a => a.id === c.academician_id);
+                    if (!c) return;
+                    const teacher = academicians.find(a => a && a.id === c.academician_id);
                     const teacherName = teacher ? `${teacher.title} ${teacher.first_name} ${teacher.last_name}` : '<span class="text-muted">Atanmadı</span>';
                     html += `
                         <tr>
-                            <td><strong class="text-primary">${c.course_code}</strong></td>
-                            <td>${c.course_name}</td>
-                            <td>${c.credits} Kredi</td>
+                            <td><strong class="text-primary">${c.course_code || ''}</strong></td>
+                            <td>${c.course_name || ''}</td>
+                            <td>${c.credits || 0} Kredi</td>
                             <td>${teacherName}</td>
                         </tr>
                     `;
@@ -1330,10 +1352,13 @@
                     filterSec.classList.add('d-none');
                     let html = `<thead><tr><th>Ders Kodu</th><th>Ders Adı</th><th>Vize (%30)</th><th>Final (%40)</th><th>Proje (%20)</th><th>Sunum (%10)</th><th>Ortalama</th><th>Harf Notu</th></tr></thead><tbody>`;
                     
-                    const mySc = JSON.parse(localStorage.getItem('obs_student_courses')).filter(item => item.student_id === sessionUser.student_id);
+                    const studentCoursesData = JSON.parse(localStorage.getItem('obs_student_courses')) || [];
+                    const mySc = studentCoursesData.filter(item => item && item.student_id === sessionUser.student_id);
                     mySc.forEach(item => {
-                        const course = courses.find(c => c.id === item.course_id);
-                        const grade = grades.find(g => g.student_course_id === item.id) || {};
+                        if (!item) return;
+                        const course = courses.find(c => c && c.id === item.course_id);
+                        if (!course) return;
+                        const grade = grades.find(g => g && g.student_course_id === item.id) || {};
                         const midterm = grade.midterm !== undefined ? grade.midterm : '-';
                         const final = grade.final !== undefined ? grade.final : '-';
                         const project = grade.project !== undefined ? grade.project : '-';
@@ -1343,8 +1368,8 @@
                         
                         html += `
                             <tr>
-                                <td><strong class="text-primary">${course.course_code}</strong></td>
-                                <td>${course.course_name}</td>
+                                <td><strong class="text-primary">${course.course_code || ''}</strong></td>
+                                <td>${course.course_name || ''}</td>
                                 <td>${midterm}</td>
                                 <td>${final}</td>
                                 <td>${project}</td>
@@ -1363,11 +1388,12 @@
                     filterSec.classList.remove('d-none');
                     // Ders dropdown'ını doldur
                     const select = document.getElementById('grade-course-select');
-                    const myCourses = courses.filter(c => c.academician_id === sessionUser.academician_id);
+                    const myCourses = courses.filter(c => c && c.academician_id === sessionUser.academician_id);
                     
                     let options = '<option value="">-- Ders Seçin --</option>';
                     myCourses.forEach(c => {
-                        options += `<option value="${c.id}">${c.course_code} - ${c.course_name}</option>`;
+                        if (!c) return;
+                        options += `<option value="${c.id}">${c.course_code || ''} - ${c.course_name || ''}</option>`;
                     });
                     select.innerHTML = options;
                     table.innerHTML = '<tbody><tr><td class="text-center text-muted py-4">Lütfen listeden bir ders seçiniz.</td></tr></tbody>';
@@ -1375,23 +1401,25 @@
                     // Admin için tüm notlar
                     filterSec.classList.add('d-none');
                     let html = `<thead><tr><th>Öğrenci No</th><th>Öğrenci Adı</th><th>Ders Kodu</th><th>Ders Adı</th><th>Ortalama</th><th>Harf Notu</th></tr></thead><tbody>`;
-                    const sc = JSON.parse(localStorage.getItem('obs_student_courses'));
-                    const allStudents = JSON.parse(localStorage.getItem('obs_students'));
+                    const sc = JSON.parse(localStorage.getItem('obs_student_courses')) || [];
+                    const allStudents = JSON.parse(localStorage.getItem('obs_students')) || [];
                     
                     grades.forEach(g => {
-                        const enroll = sc.find(item => item.id === g.student_course_id);
+                        if (!g) return;
+                        const enroll = sc.find(item => item && item.id === g.student_course_id);
                         if (!enroll) return;
-                        const student = allStudents.find(s => s.id === enroll.student_id);
-                        const course = courses.find(c => c.id === enroll.course_id);
+                        const student = allStudents.find(s => s && s.id === enroll.student_id);
+                        const course = courses.find(c => c && c.id === enroll.course_id);
+                        if (!student || !course) return; // Skip orphaned records
                         const letter = g.letter_grade ? `<span class="grade-badge grade-${g.letter_grade}">${g.letter_grade}</span>` : '<span class="grade-badge grade-empty">-</span>';
                         
                         html += `
                             <tr>
-                                <td>${student.student_number}</td>
-                                <td>${student.first_name} ${student.last_name}</td>
-                                <td><strong>${course.course_code}</strong></td>
-                                <td>${course.course_name}</td>
-                                <td><strong>${g.average !== null ? g.average : '-'}</strong></td>
+                                <td>${student.student_number || ''}</td>
+                                <td>${student.first_name || ''} ${student.last_name || ''}</td>
+                                <td><strong>${course.course_code || ''}</strong></td>
+                                <td>${course.course_name || ''}</td>
+                                <td><strong>${g.average !== null && g.average !== undefined ? g.average : '-'}</strong></td>
                                 <td>${letter}</td>
                             </tr>
                         `;
@@ -1409,21 +1437,24 @@
                     filterSec.classList.add('d-none');
                     let html = `<thead><tr><th>Ders Kodu</th><th>Ders Adı</th><th>Toplam Hafta</th><th>Devamsızlık</th><th>Durum</th></tr></thead><tbody>`;
                     
-                    const mySc = JSON.parse(localStorage.getItem('obs_student_courses')).filter(item => item.student_id === sessionUser.student_id);
-                    const att = JSON.parse(localStorage.getItem('obs_attendance'));
+                    const studentCoursesData = JSON.parse(localStorage.getItem('obs_student_courses')) || [];
+                    const mySc = studentCoursesData.filter(item => item && item.student_id === sessionUser.student_id);
+                    const att = JSON.parse(localStorage.getItem('obs_attendance')) || [];
                     
                     mySc.forEach(item => {
-                        const course = courses.find(c => c.id === item.course_id);
-                        const myWeeks = att.filter(a => a.student_course_id === item.id);
-                        const absentCount = myWeeks.filter(a => a.status === 'Absent').length;
+                        if (!item) return;
+                        const course = courses.find(c => c && c.id === item.course_id);
+                        if (!course) return;
+                        const myWeeks = att.filter(a => a && a.student_course_id === item.id);
+                        const absentCount = myWeeks.filter(a => a && a.status === 'Absent').length;
                         
                         const pct = myWeeks.length > 0 ? Math.round(((myWeeks.length - absentCount) * 100 / myWeeks.length)) : 100;
                         const badge = pct >= 70 ? `<span class="badge bg-success-light text-success">%${pct} Devam</span>` : `<span class="badge bg-danger-light text-danger">%${pct} Devam (Kaldı)</span>`;
                         
                         html += `
                             <tr>
-                                <td><strong class="text-primary">${course.course_code}</strong></td>
-                                <td>${course.course_name}</td>
+                                <td><strong class="text-primary">${course.course_code || ''}</strong></td>
+                                <td>${course.course_name || ''}</td>
                                 <td>${myWeeks.length} Hafta</td>
                                 <td class="${absentCount > 4 ? 'text-danger fw-bold' : ''}">${absentCount} Hafta (Gün)</td>
                                 <td>${badge}</td>
@@ -1435,11 +1466,12 @@
                 } else if (sessionUser.role === 'academician') {
                     filterSec.classList.remove('d-none');
                     const select = document.getElementById('attend-course-select');
-                    const myCourses = courses.filter(c => c.academician_id === sessionUser.academician_id);
+                    const myCourses = courses.filter(c => c && c.academician_id === sessionUser.academician_id);
                     
                     let options = '<option value="">-- Ders Seçin --</option>';
                     myCourses.forEach(c => {
-                        options += `<option value="${c.id}">${c.course_code} - ${c.course_name}</option>`;
+                        if (!c) return;
+                        options += `<option value="${c.id}">${c.course_code || ''} - ${c.course_name || ''}</option>`;
                     });
                     select.innerHTML = options;
                     table.innerHTML = '<tbody><tr><td class="text-center text-muted py-4">Lütfen listeden bir ders seçiniz.</td></tr></tbody>';
@@ -1447,21 +1479,23 @@
                     // Admin
                     filterSec.classList.add('d-none');
                     let html = `<thead><tr><th>Öğrenci No</th><th>Öğrenci Adı</th><th>Ders Kodu</th><th>Ders Adı</th><th>Devamsız Hafta</th></tr></thead><tbody>`;
-                    const sc = JSON.parse(localStorage.getItem('obs_student_courses'));
-                    const allStudents = JSON.parse(localStorage.getItem('obs_students'));
-                    const att = JSON.parse(localStorage.getItem('obs_attendance'));
+                    const sc = JSON.parse(localStorage.getItem('obs_student_courses')) || [];
+                    const allStudents = JSON.parse(localStorage.getItem('obs_students')) || [];
+                    const att = JSON.parse(localStorage.getItem('obs_attendance')) || [];
                     
                     sc.forEach(item => {
-                        const student = allStudents.find(s => s.id === item.student_id);
-                        const course = courses.find(c => c.id === item.course_id);
-                        const absentCount = att.filter(a => a.student_course_id === item.id && a.status === 'Absent').length;
+                        if (!item) return;
+                        const student = allStudents.find(s => s && s.id === item.student_id);
+                        const course = courses.find(c => c && c.id === item.course_id);
+                        if (!student || !course) return; // Guard
+                        const absentCount = att.filter(a => a && a.student_course_id === item.id && a.status === 'Absent').length;
                         
                         html += `
                             <tr>
-                                <td>${student.student_number}</td>
-                                <td>${student.first_name} ${student.last_name}</td>
-                                <td><strong>${course.course_code}</strong></td>
-                                <td>${course.course_name}</td>
+                                <td>${student.student_number || ''}</td>
+                                <td>${student.first_name || ''} ${student.last_name || ''}</td>
+                                <td><strong>${course.course_code || ''}</strong></td>
+                                <td>${course.course_name || ''}</td>
                                 <td class="${absentCount > 4 ? 'text-danger fw-bold' : ''}">${absentCount} Hafta</td>
                             </tr>
                         `;
@@ -1491,15 +1525,17 @@
                 return;
             }
             
-            const sc = JSON.parse(localStorage.getItem('obs_student_courses')).filter(item => item.course_id === courseId);
-            const students = JSON.parse(localStorage.getItem('obs_students'));
-            const grades = JSON.parse(localStorage.getItem('obs_grades'));
+            const sc = (JSON.parse(localStorage.getItem('obs_student_courses')) || []).filter(item => item && item.course_id === courseId);
+            const students = JSON.parse(localStorage.getItem('obs_students')) || [];
+            const grades = JSON.parse(localStorage.getItem('obs_grades')) || [];
             
             let html = `<thead><tr><th>Öğrenci No</th><th>Adı Soyadı</th><th>Vize (%30)</th><th>Final (%40)</th><th>Proje (%20)</th><th>Sunum (%10)</th><th>Ortalama</th><th>Harf Notu</th><th>İşlem</th></tr></thead><tbody>`;
             
             sc.forEach(item => {
-                const s = students.find(student => student.id === item.student_id);
-                const g = grades.find(grade => grade.student_course_id === item.id) || {};
+                if (!item) return;
+                const s = students.find(student => student && student.id === item.student_id);
+                if (!s) return; // Guard
+                const g = grades.find(grade => grade && grade.student_course_id === item.id) || {};
                 
                 const midterm = g.midterm !== undefined ? g.midterm : '-';
                 const final = g.final !== undefined ? g.final : '-';
@@ -1510,8 +1546,8 @@
                 
                 html += `
                     <tr>
-                        <td>${s.student_number}</td>
-                        <td><a onclick="simulateProfileAJAX(${s.id})" style="cursor:pointer; text-decoration:none;" class="fw-bold text-primary">${s.first_name} ${s.last_name}</a></td>
+                        <td>${s.student_number || ''}</td>
+                        <td><a onclick="simulateProfileAJAX(${s.id})" style="cursor:pointer; text-decoration:none;" class="fw-bold text-primary">${s.first_name || ''} ${s.last_name || ''}</a></td>
                         <td>${midterm}</td>
                         <td>${final}</td>
                         <td>${project}</td>
@@ -1519,7 +1555,7 @@
                         <td><strong>${avg}</strong></td>
                         <td>${letter}</td>
                         <td>
-                            <button class="btn btn-sm btn-primary" onclick="openEditGradeModal(${item.id}, '${s.first_name} ${s.last_name}', '${g.midterm || ''}', '${g.final || ''}', '${g.project || ''}', '${g.presentation || ''}')">
+                            <button class="btn btn-sm btn-primary" onclick="openEditGradeModal(${item.id}, '${s.first_name || ''} ${s.last_name || ''}', '${g.midterm || ''}', '${g.final || ''}', '${g.project || ''}', '${g.presentation || ''}')">
                                 <i class="fas fa-edit"></i> Not Gir
                             </button>
                         </td>
@@ -1590,9 +1626,9 @@
         });
 
         function recalculateGpa(studentId) {
-            const sc = JSON.parse(localStorage.getItem('obs_student_courses')).filter(item => item.student_id === studentId);
-            const grades = JSON.parse(localStorage.getItem('obs_grades'));
-            const courses = JSON.parse(localStorage.getItem('obs_courses'));
+            const sc = (JSON.parse(localStorage.getItem('obs_student_courses')) || []).filter(item => item && item.student_id === studentId);
+            const grades = JSON.parse(localStorage.getItem('obs_grades')) || [];
+            const courses = JSON.parse(localStorage.getItem('obs_courses')) || [];
             
             const pointsMap = { 'AA':4.0, 'BA':3.5, 'BB':3.0, 'CB':2.5, 'CC':2.0, 'DC':1.5, 'DD':1.0, 'FD':0.5, 'FF':0.0 };
             
@@ -1600,9 +1636,10 @@
             let totalCredits = 0;
             
             sc.forEach(item => {
-                const g = grades.find(grade => grade.student_course_id === item.id);
-                const c = courses.find(course => course.id === item.course_id);
-                if (g && g.letter_grade && pointsMap[g.letter_grade] !== undefined) {
+                if (!item) return;
+                const g = grades.find(grade => grade && grade.student_course_id === item.id);
+                const c = courses.find(course => course && course.id === item.course_id);
+                if (g && g.letter_grade && pointsMap[g.letter_grade] !== undefined && c) {
                     totalPoints += pointsMap[g.letter_grade] * c.credits;
                     totalCredits += c.credits;
                 }
@@ -1610,8 +1647,8 @@
             
             const gpa = totalCredits > 0 ? Math.round((totalPoints / totalCredits) * 100) / 100 : 0.00;
             
-            const students = JSON.parse(localStorage.getItem('obs_students'));
-            const sIdx = students.findIndex(s => s.id === studentId);
+            const students = JSON.parse(localStorage.getItem('obs_students')) || [];
+            const sIdx = students.findIndex(s => s && s.id === studentId);
             if (sIdx > -1) {
                 students[sIdx].gpa = gpa.toFixed(2);
                 localStorage.setItem('obs_students', JSON.stringify(students));
@@ -1629,29 +1666,31 @@
                 return;
             }
             
-            const sc = JSON.parse(localStorage.getItem('obs_student_courses')).filter(item => item.course_id === courseId);
-            const students = JSON.parse(localStorage.getItem('obs_students'));
-            const att = JSON.parse(localStorage.getItem('obs_attendance'));
+            const sc = (JSON.parse(localStorage.getItem('obs_student_courses')) || []).filter(item => item && item.course_id === courseId);
+            const students = JSON.parse(localStorage.getItem('obs_students')) || [];
+            const att = JSON.parse(localStorage.getItem('obs_attendance')) || [];
             
             let html = `<thead><tr><th>Öğrenci No</th><th>Adı Soyadı</th><th>Toplam Hafta</th><th>Gelmeme Hafta</th><th>Devam Yüzdesi</th><th>İşlem</th></tr></thead><tbody>`;
             
             sc.forEach(item => {
-                const s = students.find(student => student.id === item.student_id);
-                const myWeeks = att.filter(a => a.student_course_id === item.id);
-                const absentCount = myWeeks.filter(a => a.status === 'Absent').length;
+                if (!item) return;
+                const s = students.find(student => student && student.id === item.student_id);
+                if (!s) return; // Guard
+                const myWeeks = att.filter(a => a && a.student_course_id === item.id);
+                const absentCount = myWeeks.filter(a => a && a.status === 'Absent').length;
                 
                 const pct = myWeeks.length > 0 ? Math.round(((myWeeks.length - absentCount) * 100 / myWeeks.length)) : 100;
                 const badge = pct >= 70 ? `<span class="badge bg-success-light text-success">%${pct}</span>` : `<span class="badge bg-danger-light text-danger">%${pct} (Kaldı)</span>`;
                 
                 html += `
                     <tr>
-                        <td>${s.student_number}</td>
-                        <td>${s.first_name} ${s.last_name}</td>
+                        <td>${s.student_number || ''}</td>
+                        <td>${s.first_name || ''} ${s.last_name || ''}</td>
                         <td>${myWeeks.length} Hafta</td>
                         <td class="${absentCount > 4 ? 'text-danger fw-bold' : ''}">${absentCount} Hafta</td>
                         <td>${badge}</td>
                         <td>
-                            <button class="btn btn-sm btn-outline-primary" onclick="openEditAttendModal(${item.id}, '${s.first_name} ${s.last_name}')">
+                            <button class="btn btn-sm btn-outline-primary" onclick="openEditAttendModal(${item.id}, '${s.first_name || ''} ${s.last_name || ''}')">
                                 <i class="fas fa-calendar-alt"></i> Devamsızlık Yönet
                             </button>
                         </td>
@@ -1718,33 +1757,35 @@
         // AKADEMİSYEN: ÖĞRENCİ DETAY PROFILLERI (AJAX SİMÜLASYONU)
         // -------------------------------------------------------------
         function simulateProfileAJAX(studentId) {
-            const students = JSON.parse(localStorage.getItem('obs_students'));
-            const s = students.find(student => student.id === studentId);
+            const students = JSON.parse(localStorage.getItem('obs_students')) || [];
+            const s = students.find(student => student && student.id === studentId);
             if (!s) return;
             
-            const users = JSON.parse(localStorage.getItem('obs_users'));
-            const u = users.find(user => user.id === s.user_id);
+            const users = JSON.parse(localStorage.getItem('obs_users')) || [];
+            const u = users.find(user => user && user.id === s.user_id) || {};
             
-            document.getElementById('prof-name').innerText = `${s.first_name} ${s.last_name}`;
-            document.getElementById('prof-number').innerText = s.student_number;
-            document.getElementById('prof-email').innerText = u.email;
-            document.getElementById('prof-gpa').innerText = s.gpa;
-            document.getElementById('prof-avatar').innerText = `${s.first_name[0]}${s.last_name[0]}`.toUpperCase();
+            document.getElementById('prof-name').innerText = `${s.first_name || ''} ${s.last_name || ''}`;
+            document.getElementById('prof-number').innerText = s.student_number || '';
+            document.getElementById('prof-email').innerText = u.email || '';
+            document.getElementById('prof-gpa').innerText = s.gpa || '0.00';
+            document.getElementById('prof-avatar').innerText = `${(s.first_name || 'S')[0]}${(s.last_name || 'T')[0]}`.toUpperCase();
             
             // Notları yükle
-            const sc = JSON.parse(localStorage.getItem('obs_student_courses')).filter(item => item.student_id === studentId);
-            const courses = JSON.parse(localStorage.getItem('obs_courses'));
-            const grades = JSON.parse(localStorage.getItem('obs_grades'));
+            const sc = (JSON.parse(localStorage.getItem('obs_student_courses')) || []).filter(item => item && item.student_id === studentId);
+            const courses = JSON.parse(localStorage.getItem('obs_courses')) || [];
+            const grades = JSON.parse(localStorage.getItem('obs_grades')) || [];
             
             let coursesHtml = '';
             sc.forEach(item => {
-                const c = courses.find(course => course.id === item.course_id);
-                const g = grades.find(grade => grade.student_course_id === item.id) || {};
+                if (!item) return;
+                const c = courses.find(course => course && course.id === item.course_id);
+                if (!c) return;
+                const g = grades.find(grade => grade && grade.student_course_id === item.id) || {};
                 const letter = g.letter_grade ? `<span class="grade-badge grade-${g.letter_grade}">${g.letter_grade}</span>` : '<span class="grade-badge grade-empty">-</span>';
                 coursesHtml += `
                     <tr>
-                        <td><strong>${c.course_code}</strong> - ${c.course_name}</td>
-                        <td>${c.credits}</td>
+                        <td><strong>${c.course_code || ''}</strong> - ${c.course_name || ''}</td>
+                        <td>${c.credits || 0}</td>
                         <td>${letter}</td>
                     </tr>
                 `;
@@ -1752,14 +1793,16 @@
             document.getElementById('prof-courses-body').innerHTML = coursesHtml || '<tr><td colspan="3" class="text-center text-muted">Ders kaydı bulunamadı.</td></tr>';
             
             // Devamsızlıkları yükle
-            const att = JSON.parse(localStorage.getItem('obs_attendance'));
+            const att = JSON.parse(localStorage.getItem('obs_attendance')) || [];
             let attHtml = '';
             sc.forEach(item => {
-                const c = courses.find(course => course.id === item.course_id);
-                const count = att.filter(a => a.student_course_id === item.id && a.status === 'Absent').length;
+                if (!item) return;
+                const c = courses.find(course => course && course.id === item.course_id);
+                if (!c) return;
+                const count = att.filter(a => a && a.student_course_id === item.id && a.status === 'Absent').length;
                 attHtml += `
                     <tr>
-                        <td><strong>${c.course_code}</strong></td>
+                        <td><strong>${c.course_code || ''}</strong></td>
                         <td class="${count > 4 ? 'text-danger fw-bold' : ''}">${count} Gün</td>
                     </tr>
                 `;
@@ -1905,46 +1948,46 @@
             }
             if (!confirm('Kullanıcıyı ve ilgili tüm verileri silmek istediğinizden emin misiniz?')) return;
             
-            let users = JSON.parse(localStorage.getItem('obs_users'));
-            const user = users.find(u => u.id === userId);
+            let users = JSON.parse(localStorage.getItem('obs_users')) || [];
+            const user = users.find(u => u && u.id === userId);
             if (!user) return;
             
-            users = users.filter(u => u.id !== userId);
+            users = users.filter(u => u && u.id !== userId);
             localStorage.setItem('obs_users', JSON.stringify(users));
             
             if (user.role === 'student') {
-                let students = JSON.parse(localStorage.getItem('obs_students'));
-                const s = students.find(item => item.user_id === userId);
+                let students = JSON.parse(localStorage.getItem('obs_students')) || [];
+                const s = students.find(item => item && item.user_id === userId);
                 if (s) {
-                    students = students.filter(item => item.user_id !== userId);
+                    students = students.filter(item => item && item.user_id !== userId);
                     localStorage.setItem('obs_students', JSON.stringify(students));
                     
                     // Ders kayıtlarını sil
-                    let sc = JSON.parse(localStorage.getItem('obs_student_courses'));
-                    const myScIds = sc.filter(item => item.student_id === s.id).map(item => item.id);
-                    sc = sc.filter(item => item.student_id !== s.id);
+                    let sc = JSON.parse(localStorage.getItem('obs_student_courses')) || [];
+                    const myScIds = sc.filter(item => item && item.student_id === s.id).map(item => item.id);
+                    sc = sc.filter(item => item && item.student_id !== s.id);
                     localStorage.setItem('obs_student_courses', JSON.stringify(sc));
                     
                     // Not ve devamsızlıkları sil
-                    let grades = JSON.parse(localStorage.getItem('obs_grades'));
-                    grades = grades.filter(g => !myScIds.includes(g.student_course_id));
+                    let grades = JSON.parse(localStorage.getItem('obs_grades')) || [];
+                    grades = grades.filter(g => g && !myScIds.includes(g.student_course_id));
                     localStorage.setItem('obs_grades', JSON.stringify(grades));
                     
-                    let att = JSON.parse(localStorage.getItem('obs_attendance'));
-                    att = att.filter(a => !myScIds.includes(a.student_course_id));
+                    let att = JSON.parse(localStorage.getItem('obs_attendance')) || [];
+                    att = att.filter(a => a && !myScIds.includes(a.student_course_id));
                     localStorage.setItem('obs_attendance', JSON.stringify(att));
                 }
             } else if (user.role === 'academician') {
-                let teachers = JSON.parse(localStorage.getItem('obs_academicians'));
-                const t = teachers.find(item => item.user_id === userId);
+                let teachers = JSON.parse(localStorage.getItem('obs_academicians')) || [];
+                const t = teachers.find(item => item && item.user_id === userId);
                 if (t) {
-                    teachers = teachers.filter(item => item.user_id !== userId);
+                    teachers = teachers.filter(item => item && item.user_id !== userId);
                     localStorage.setItem('obs_academicians', JSON.stringify(teachers));
                     
                     // Derslerin hocasını boşa çıkar
-                    let courses = JSON.parse(localStorage.getItem('obs_courses'));
+                    let courses = JSON.parse(localStorage.getItem('obs_courses')) || [];
                     courses.forEach(c => {
-                        if (c.academician_id === t.id) c.academician_id = null;
+                        if (c && c.academician_id === t.id) c.academician_id = null;
                     });
                     localStorage.setItem('obs_courses', JSON.stringify(courses));
                 }
@@ -1958,21 +2001,22 @@
         // ADMIN: DERS YÖNETİMİ
         // -------------------------------------------------------------
         function loadCoursesMgmtData() {
-            const courses = JSON.parse(localStorage.getItem('obs_courses'));
-            const teachers = JSON.parse(localStorage.getItem('obs_academicians'));
-            const students = JSON.parse(localStorage.getItem('obs_students'));
+            const courses = JSON.parse(localStorage.getItem('obs_courses')) || [];
+            const teachers = JSON.parse(localStorage.getItem('obs_academicians')) || [];
+            const students = JSON.parse(localStorage.getItem('obs_students')) || [];
             
             // Dersler Listesi
             const table = document.getElementById('table-courses-mgmt-list');
             let html = `<thead><tr><th>Ders Kodu</th><th>Ders Adı</th><th>Kredi</th><th>Hocası</th><th class="text-end">İşlem</th></tr></thead><tbody>`;
             courses.forEach(c => {
-                const t = teachers.find(item => item.id === c.academician_id);
+                if (!c) return;
+                const t = teachers.find(item => item && item.id === c.academician_id);
                 const tName = t ? `${t.title} ${t.first_name} ${t.last_name}` : '<span class="text-muted">Atanmadı</span>';
                 html += `
                     <tr>
-                        <td><strong class="text-primary">${c.course_code}</strong></td>
-                        <td>${c.course_name}</td>
-                        <td>${c.credits}</td>
+                        <td><strong class="text-primary">${c.course_code || ''}</strong></td>
+                        <td>${c.course_name || ''}</td>
+                        <td>${c.credits || 0}</td>
                         <td>${tName}</td>
                         <td class="text-end">
                             <button class="btn btn-sm btn-outline-danger" onclick="deleteCourse(${c.id})"><i class="fas fa-trash-alt"></i></button>
@@ -1986,6 +2030,7 @@
             // Ders Ekleme Seçenekleri
             let teacherOptions = '<option value="">Atama Yapma</option>';
             teachers.forEach(t => {
+                if (!t) return;
                 teacherOptions += `<option value="${t.id}">${t.title} ${t.first_name} ${t.last_name}</option>`;
             });
             document.getElementById('mgmt-course-teacher').innerHTML = teacherOptions;
@@ -1993,20 +2038,23 @@
             // Form Seçeneklerini Doldur
             let courseOptions = '<option value="">-- Ders Seçiniz --</option>';
             courses.forEach(c => {
-                courseOptions += `<option value="${c.id}">${c.course_code} - ${c.course_name}</option>`;
+                if (!c) return;
+                courseOptions += `<option value="${c.id}">${c.course_code || ''} - ${c.course_name || ''}</option>`;
             });
             document.getElementById('assign-course-select').innerHTML = courseOptions;
             document.getElementById('enroll-course-select').innerHTML = courseOptions;
             
             let teacherAssignOptions = '<option value="">Hoca Atamasını Kaldır</option>';
             teachers.forEach(t => {
+                if (!t) return;
                 teacherAssignOptions += `<option value="${t.id}">${t.title} ${t.first_name} ${t.last_name}</option>`;
             });
             document.getElementById('assign-teacher-select').innerHTML = teacherAssignOptions;
             
             let studentOptions = '<option value="">-- Öğrenci Seçiniz --</option>';
             students.forEach(s => {
-                studentOptions += `<option value="${s.id}">${s.student_number} - ${s.first_name} ${s.last_name}</option>`;
+                if (!s) return;
+                studentOptions += `<option value="${s.id}">${s.student_number || ''} - ${s.first_name || ''} ${s.last_name || ''}</option>`;
             });
             document.getElementById('enroll-student-select').innerHTML = studentOptions;
         }
@@ -2018,13 +2066,13 @@
             const credits = parseInt(document.getElementById('mgmt-course-credits').value);
             const teacherId = document.getElementById('mgmt-course-teacher').value;
             
-            const courses = JSON.parse(localStorage.getItem('obs_courses'));
-            if (courses.some(c => c.course_code === code)) {
+            const courses = JSON.parse(localStorage.getItem('obs_courses')) || [];
+            if (courses.some(c => c && c.course_code === code)) {
                 alert('Bu ders kodu zaten tanımlı!');
                 return;
             }
             
-            const nextId = Math.max(...courses.map(c => c.id)) + 1;
+            const nextId = courses.length > 0 ? Math.max(...courses.filter(c => c).map(c => c.id)) + 1 : 1;
             courses.push({
                 id: nextId,
                 course_code: code,
@@ -2044,8 +2092,8 @@
             const cId = parseInt(document.getElementById('assign-course-select').value);
             const tId = document.getElementById('assign-teacher-select').value;
             
-            const courses = JSON.parse(localStorage.getItem('obs_courses'));
-            const idx = courses.findIndex(c => c.id === cId);
+            const courses = JSON.parse(localStorage.getItem('obs_courses')) || [];
+            const idx = courses.findIndex(c => c && c.id === cId);
             if (idx > -1) {
                 courses[idx].academician_id = tId ? parseInt(tId) : null;
                 localStorage.setItem('obs_courses', JSON.stringify(courses));
@@ -2059,22 +2107,22 @@
             const cId = parseInt(document.getElementById('enroll-course-select').value);
             const sId = parseInt(document.getElementById('enroll-student-select').value);
             
-            const sc = JSON.parse(localStorage.getItem('obs_student_courses'));
-            if (sc.some(item => item.student_id === sId && item.course_id === cId)) {
+            const sc = JSON.parse(localStorage.getItem('obs_student_courses')) || [];
+            if (sc.some(item => item && item.student_id === sId && item.course_id === cId)) {
                 alert('Öğrenci bu derse zaten kayıtlı!');
                 return;
             }
             
-            const nextId = Math.max(...sc.map(item => item.id)) + 1;
+            const nextId = sc.length > 0 ? Math.max(...sc.filter(item => item).map(item => item.id)) + 1 : 1;
             sc.push({ id: nextId, student_id: sId, course_id: cId });
             localStorage.setItem('obs_student_courses', JSON.stringify(sc));
             
             // Boş not ve devamsızlık kayıtlarını oluştur
-            const grades = JSON.parse(localStorage.getItem('obs_grades'));
+            const grades = JSON.parse(localStorage.getItem('obs_grades')) || [];
             grades.push({ id: nextId, student_course_id: nextId });
             localStorage.setItem('obs_grades', JSON.stringify(grades));
             
-            const att = JSON.parse(localStorage.getItem('obs_attendance'));
+            const att = JSON.parse(localStorage.getItem('obs_attendance')) || [];
             for (let w = 1; w <= 14; w++) {
                 att.push({ id: `${nextId}_${w}`, student_course_id: nextId, week_number: w, status: 'Present' });
             }
@@ -2087,23 +2135,23 @@
         function deleteCourse(courseId) {
             if (!confirm('Dersi silmek istediğinizden emin misiniz? (Öğrenci kayıtları ve notlar da silinecektir.)')) return;
             
-            let courses = JSON.parse(localStorage.getItem('obs_courses'));
-            courses = courses.filter(c => c.id !== courseId);
+            let courses = JSON.parse(localStorage.getItem('obs_courses')) || [];
+            courses = courses.filter(c => c && c.id !== courseId);
             localStorage.setItem('obs_courses', JSON.stringify(courses));
             
             // Kayıtları, notları sil
-            let sc = JSON.parse(localStorage.getItem('obs_student_courses'));
-            const myScIds = sc.filter(item => item.course_id === courseId).map(item => item.id);
+            let sc = JSON.parse(localStorage.getItem('obs_student_courses')) || [];
+            const myScIds = sc.filter(item => item && item.course_id === courseId).map(item => item.id);
             
-            sc = sc.filter(item => item.course_id !== courseId);
+            sc = sc.filter(item => item && item.course_id !== courseId);
             localStorage.setItem('obs_student_courses', JSON.stringify(sc));
             
-            let grades = JSON.parse(localStorage.getItem('obs_grades'));
-            grades = grades.filter(g => !myScIds.includes(g.student_course_id));
+            let grades = JSON.parse(localStorage.getItem('obs_grades')) || [];
+            grades = grades.filter(g => g && !myScIds.includes(g.student_course_id));
             localStorage.setItem('obs_grades', JSON.stringify(grades));
             
-            let att = JSON.parse(localStorage.getItem('obs_attendance'));
-            att = att.filter(a => !myScIds.includes(a.student_course_id));
+            let att = JSON.parse(localStorage.getItem('obs_attendance')) || [];
+            att = att.filter(a => a && !myScIds.includes(a.student_course_id));
             localStorage.setItem('obs_attendance', JSON.stringify(att));
             
             showNotification('Ders silindi.', 'success');
@@ -2176,10 +2224,8 @@
             });
         }
 
-        // Başlangıç Kurulumları
-        window.addEventListener('load', () => {
-            initLocalStorage();
-        });
+        // Başlangıç Kurulumları - LocalStorage veritabanını anında kurarak yarış durumlarını engelliyoruz
+        initLocalStorage();
     </script>
 </body>
 </html>
