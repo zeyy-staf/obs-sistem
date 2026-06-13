@@ -1,0 +1,1990 @@
+<!DOCTYPE html>
+<html lang="tr" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Üniversite Öğrenci Bilgi Sistemi (OBS) - İleri Programlama Projesi">
+    <title>Öğrenci Bilgi Sistemi | OBS</title>
+    
+    <!-- Bootstrap 5 CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome Simgeleri CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Premium Google Fonts (Outfit & Inter) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        /* ==========================================================================
+           1. MODERN TASARIM DEĞİŞKENLERİ (LIGHT & DARK THEME)
+           ========================================================================== */
+        :root {
+            --bg-primary: #f1f5f9;
+            --bg-secondary: #ffffff;
+            --bg-card: #ffffff;
+            --border-color: #e2e8f0;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #64748b;
+            
+            --sidebar-bg: #0f172a;
+            --sidebar-hover: #1e293b;
+            --sidebar-active: #4f46e5;
+            --sidebar-text: #94a3b8;
+            --sidebar-text-active: #ffffff;
+            
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --primary-light: rgba(79, 70, 229, 0.1);
+            
+            --success: #10b981;
+            --success-light: rgba(16, 185, 129, 0.1);
+            --warning: #f59e0b;
+            --warning-light: rgba(245, 158, 11, 0.1);
+            --danger: #ef4444;
+            --danger-light: rgba(239, 68, 68, 0.1);
+            --info: #06b6d4;
+            --info-light: rgba(6, 182, 212, 0.1);
+            
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            --transition-speed: 0.25s;
+            --border-radius: 12px;
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #0b0f19;
+            --bg-secondary: #111827;
+            --bg-card: #1f2937;
+            --border-color: #374151;
+            --text-primary: #f9fafb;
+            --text-secondary: #d1d5db;
+            --text-muted: #9ca3af;
+            
+            --sidebar-bg: #030712;
+            --sidebar-hover: #111827;
+            --sidebar-active: #6366f1;
+            --sidebar-text: #9ca3af;
+            --sidebar-text-active: #f9fafb;
+            
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --primary-light: rgba(99, 102, 241, 0.15);
+            
+            --success: #34d399;
+            --success-light: rgba(52, 211, 153, 0.15);
+            --warning: #fbbf24;
+            --warning-light: rgba(251, 191, 36, 0.15);
+            --danger: #f87171;
+            --danger-light: rgba(248, 113, 113, 0.15);
+            --info: #22d3ee;
+            --info-light: rgba(34, 211, 238, 0.15);
+            
+            --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -4px rgba(0, 0, 0, 0.3);
+        }
+
+        /* ==========================================================================
+           2. GENEL ARAYÜZ KURALLARI & TIPOGRAFI
+           ========================================================================== */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 0;
+            transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+        }
+
+        /* İnce Kaydırma Çubuğu */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted);
+        }
+
+        /* ==========================================================================
+           3. GİRİŞ (LOGIN) EKRANI STİLLERİ
+           ========================================================================== */
+        .login-wrapper {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.15) 0%, transparent 40%),
+                        radial-gradient(circle at 90% 80%, rgba(6, 182, 212, 0.15) 0%, transparent 40%),
+                        var(--bg-primary);
+            padding: 20px;
+        }
+
+        .login-card {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 45px 40px;
+            box-shadow: var(--card-shadow);
+            width: 100%;
+            max-width: 440px;
+            transition: transform 0.3s ease;
+        }
+        
+        .login-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .login-logo {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--primary);
+            text-align: center;
+            margin-bottom: 5px;
+            font-family: 'Outfit', sans-serif;
+            letter-spacing: -1px;
+        }
+
+        .login-subtitle {
+            color: var(--text-muted);
+            text-align: center;
+            font-size: 14px;
+            margin-bottom: 35px;
+        }
+
+        /* ==========================================================================
+           4. PANEL (DASHBOARD) DÜZENİ & BİLEŞENLERİ
+           ========================================================================== */
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Modern Sidebar */
+        .sidebar {
+            width: 270px;
+            background-color: var(--sidebar-bg);
+            color: var(--sidebar-text);
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1010;
+            flex-shrink: 0;
+            border-right: 1px solid var(--border-color);
+        }
+
+        .sidebar-brand {
+            padding: 24px 30px;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--sidebar-text-active);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .sidebar-brand i {
+            color: var(--primary);
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 20px 15px;
+            margin: 0;
+            flex-grow: 1;
+        }
+
+        .sidebar-item {
+            margin-bottom: 6px;
+        }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 18px;
+            color: var(--sidebar-text);
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 15px;
+            transition: all 0.2s ease;
+        }
+
+        .sidebar-link:hover {
+            background-color: var(--sidebar-hover);
+            color: var(--sidebar-text-active);
+        }
+
+        .sidebar-link.active {
+            background-color: var(--sidebar-active);
+            color: var(--sidebar-text-active);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+        }
+
+        .sidebar-user-section {
+            padding: 20px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            background-color: rgba(0,0,0,0.2);
+        }
+
+        /* Ana İçerik Alanı */
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            min-height: 100vh;
+        }
+
+        /* Modern Üst Menü (Top Navbar) */
+        .top-navbar {
+            background-color: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            height: 70px;
+            padding: 0 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .toggle-sidebar-btn {
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 20px;
+            cursor: pointer;
+            display: none; /* Mobilde görünecek */
+        }
+
+        .user-profile-badge {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary-light);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        /* ==========================================================================
+           5. DASHBOARD KARTLARI VE TABLOLAR
+           ========================================================================== */
+        .content-body {
+            padding: 30px;
+            flex-grow: 1;
+        }
+
+        .dashboard-header {
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 24px;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px -10px rgba(0,0,0,0.1);
+        }
+
+        .stat-info h3 {
+            font-size: 28px;
+            margin-bottom: 4px;
+            font-weight: 700;
+        }
+
+        .stat-info p {
+            color: var(--text-muted);
+            margin: 0;
+            font-size: 14px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-icon {
+            width: 54px;
+            height: 54px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        /* Modern Tablolar */
+        .table-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        .table-card-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: transparent;
+        }
+
+        .table-card-title {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .obs-table {
+            margin: 0;
+            width: 100%;
+        }
+
+        .obs-table th {
+            background-color: rgba(0, 0, 0, 0.02);
+            color: var(--text-secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        [data-theme="dark"] .obs-table th {
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+
+        .obs-table td {
+            padding: 16px 24px;
+            vertical-align: middle;
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--border-color);
+            font-size: 14px;
+        }
+
+        .obs-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .obs-table tbody tr {
+            transition: background-color 0.15s ease;
+        }
+
+        .obs-table tbody tr:hover {
+            background-color: rgba(0, 0, 0, 0.01);
+        }
+
+        [data-theme="dark"] .obs-table tbody tr:hover {
+            background-color: rgba(255, 255, 255, 0.01);
+        }
+
+        /* Harf Notu Rozetleri */
+        .grade-badge {
+            font-weight: 700;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            display: inline-block;
+            text-align: center;
+            min-width: 42px;
+        }
+        .grade-AA { background-color: var(--success-light); color: var(--success); }
+        .grade-BA { background-color: var(--success-light); color: var(--success); }
+        .grade-BB { background-color: var(--success-light); color: var(--success); }
+        .grade-CB { background-color: var(--info-light); color: var(--info); }
+        .grade-CC { background-color: var(--info-light); color: var(--info); }
+        .grade-DC { background-color: var(--warning-light); color: var(--warning); }
+        .grade-DD { background-color: var(--warning-light); color: var(--warning); }
+        .grade-FD { background-color: var(--danger-light); color: var(--danger); }
+        .grade-FF { background-color: var(--danger-light); color: var(--danger); }
+        .grade-empty { background-color: var(--border-color); color: var(--text-muted); }
+
+        /* Arama Kutusu ve Butonlar */
+        .search-box-container {
+            position: relative;
+            max-width: 320px;
+            width: 100%;
+        }
+
+        .search-box-input {
+            width: 100%;
+            padding: 10px 16px 10px 40px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .search-box-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        .search-box-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            pointer-events: none;
+        }
+
+        /* Modern Modallar */
+        .modal-content {
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+        }
+        
+        .modal-header {
+            border-bottom: 1px solid var(--border-color);
+            padding: 20px 24px;
+        }
+        
+        .modal-body {
+            padding: 24px;
+        }
+
+        .modal-footer {
+            border-top: 1px solid var(--border-color);
+            padding: 18px 24px;
+        }
+
+        .theme-toggle-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 18px;
+            cursor: pointer;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+        }
+
+        .theme-toggle-btn:hover {
+            background-color: var(--border-color);
+            color: var(--text-primary);
+        }
+
+        /* Mobil Uyumlu Düzenlemeler */
+        @media (max-width: 992px) {
+            .sidebar {
+                position: fixed;
+                left: -270px;
+                top: 0;
+                bottom: 0;
+                height: 100vh;
+            }
+            .sidebar.show {
+                left: 0;
+            }
+            .toggle-sidebar-btn {
+                display: block;
+            }
+            .top-navbar {
+                padding: 0 20px;
+            }
+            .content-body {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Flash Mesajları (Bildirim Sistemi) -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div style="position: fixed; top: 20px; right: 20px; z-index: 2000; min-width: 300px; max-width: 450px;">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category if category != 'error' else 'danger' }} alert-dismissible fade show shadow-lg border-0" role="alert" style="border-radius: 10px;">
+                        <div class="d-flex align-items-center gap-2">
+                            {% if category == 'success' %}
+                                <i class="fas fa-check-circle fs-5"></i>
+                            {% elif category == 'danger' or category == 'error' %}
+                                <i class="fas fa-exclamation-circle fs-5"></i>
+                            {% else %}
+                                <i class="fas fa-info-circle fs-5"></i>
+                            {% endif %}
+                            <div>{{ message }}</div>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Kapat"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- ROTALAMA ALANI -->
+    {% if page == 'login' %}
+        <!-- ====================================================================
+             A. GİRİŞ EKRANI (LOGIN SAYFASI)
+             ==================================================================== -->
+        <div class="login-wrapper">
+            <div class="login-card">
+                <div class="login-logo">
+                    <i class="fas fa-graduation-cap"></i> OBS SYSTEM
+                </div>
+                <div class="login-subtitle">İleri Programlama Öğrenci Bilgi Sistemi</div>
+                
+                <form action="{{ url_for('login') }}" method="POST" autocomplete="off">
+                    <div class="mb-3">
+                        <label for="username" class="form-label font-weight-600" style="font-size:14px;">Kullanıcı Adı</label>
+                        <div class="input-group">
+                            <span class="input-group-text border-end-0 bg-transparent text-muted"><i class="fas fa-user"></i></span>
+                            <input type="text" class="form-control border-start-0 ps-0" id="username" name="username" placeholder="Kullanıcı adınızı girin" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="password" class="form-label font-weight-600" style="font-size:14px;">Şifre</label>
+                        <div class="input-group">
+                            <span class="input-group-text border-end-0 bg-transparent text-muted"><i class="fas fa-lock"></i></span>
+                            <input type="password" class="form-control border-start-0 ps-0" id="password" name="password" placeholder="Şifrenizi girin" required>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary w-100 py-2 fs-6" style="border-radius:8px; background-color: var(--primary); border: none;">
+                        Giriş Yap <i class="fas fa-sign-in-alt ms-2"></i>
+                    </button>
+                </form>
+                
+                <div class="mt-4 text-center">
+                    <button class="theme-toggle-btn mx-auto" onclick="toggleTheme()" title="Temayı Değiştir">
+                        <i class="fas fa-moon" id="theme-icon"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    {% else %}
+        <!-- ====================================================================
+             B. ANA PANEL (SIDEBAR + TOPBAR + İÇERİK)
+             ==================================================================== -->
+        <div class="app-container">
+            <!-- Sol Menü (Sidebar) -->
+            <div class="sidebar" id="sidebar">
+                <div class="sidebar-brand">
+                    <i class="fas fa-graduation-cap"></i> 
+                    <span>OBS PORTAL</span>
+                </div>
+                
+                <ul class="sidebar-menu">
+                    <li class="sidebar-item">
+                        <a href="{{ url_for('index', page='dashboard') }}" class="sidebar-link {% if page == 'dashboard' %}active{% endif %}">
+                            <i class="fas fa-chart-pie"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="{{ url_for('index', page='courses') }}" class="sidebar-link {% if page == 'courses' %}active{% endif %}">
+                            <i class="fas fa-book-open"></i>
+                            <span>Dersler</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="{{ url_for('index', page='grades') }}" class="sidebar-link {% if page == 'grades' %}active{% endif %}">
+                            <i class="fas fa-award"></i>
+                            <span>Notlar</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="{{ url_for('index', page='attendance') }}" class="sidebar-link {% if page == 'attendance' %}active{% endif %}">
+                            <i class="fas fa-calendar-check"></i>
+                            <span>Devamsızlık</span>
+                        </a>
+                    </li>
+                    
+                    <!-- Sadece Admin Görebilir -->
+                    {% if session.role == 'admin' %}
+                        <li class="sidebar-item mt-4">
+                            <div class="px-3 mb-2 text-uppercase font-weight-700 text-muted" style="font-size: 11px; letter-spacing: 1px;">YÖNETİM</div>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('index', page='users') }}" class="sidebar-link {% if page == 'users' %}active{% endif %}">
+                                <i class="fas fa-users-cog"></i>
+                                <span>Kullanıcı Yönetimi</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('index', page='courses_mgmt') }}" class="sidebar-link {% if page == 'courses_mgmt' %}active{% endif %}">
+                                <i class="fas fa-folder-plus"></i>
+                                <span>Ders Yönetimi</span>
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+                
+                <!-- Çıkış Butonu ve Kullanıcı Bilgisi -->
+                <div class="sidebar-user-section">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="user-avatar" style="width:34px; height:34px; font-size:13px;">
+                                {{ session.username[:2].upper() }}
+                            </div>
+                            <div style="min-width: 0;">
+                                <div class="text-white text-truncate font-weight-600" style="font-size:13px;" title="{{ session.full_name }}">
+                                    {{ session.full_name }}
+                                </div>
+                                <div style="font-size:11px; color:var(--sidebar-text)">
+                                    {% if session.role == 'admin' %}Yönetici
+                                    {% elif session.role == 'academician' %}Akademisyen
+                                    {% else %}Öğrenci{% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <a href="{{ url_for('logout') }}" class="text-danger fs-5" title="Güvenli Çıkış">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sağ Bölüm (İçerik Paneli) -->
+            <div class="main-content">
+                <!-- Üst Navbar -->
+                <div class="top-navbar">
+                    <div class="d-flex align-items-center gap-3">
+                        <button class="toggle-sidebar-btn" onclick="toggleSidebar()">
+                            <i class="fas fa-bars"></i>
+                        </button>
+                        <h4 class="mb-0" style="font-family:'Outfit'">
+                            {% if page == 'dashboard' %}Genel Bakış (Dashboard)
+                            {% elif page == 'courses' %}Ders Listeleri
+                            {% elif page == 'grades' %}Not Bilgileri
+                            {% elif page == 'attendance' %}Devamsızlık Takibi
+                            {% elif page == 'users' %}Kullanıcı İşlemleri
+                            {% elif page == 'courses_mgmt' %}Ders Yapılandırması
+                            {% endif %}
+                        </h4>
+                    </div>
+                    
+                    <div class="d-flex align-items-center gap-3">
+                        <!-- Arama Kutusu (Dashboard dışındaki sayfalarda aktiftir) -->
+                        {% if page != 'dashboard' %}
+                            <div class="search-box-container d-none d-md-block">
+                                <i class="fas fa-search search-box-icon"></i>
+                                <input type="text" id="global-search" class="search-box-input" placeholder="Tablolarda ara..." onkeyup="filterAllTables()">
+                            </div>
+                        {% endif %}
+
+                        <button class="theme-toggle-btn" onclick="toggleTheme()" title="Temayı Değiştir">
+                            <i class="fas fa-moon" id="theme-icon"></i>
+                        </button>
+                        
+                        <div class="user-profile-badge border-start ps-3">
+                            <div class="text-end d-none d-sm-block">
+                                <div class="font-weight-600" style="font-size:14px;">{{ session.full_name }}</div>
+                                <div class="text-muted" style="font-size:11px;">{{ session.email }}</div>
+                            </div>
+                            <div class="user-avatar">
+                                {{ session.username[:2].upper() }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gövde Alanı -->
+                <div class="content-body">
+                    
+                    <!-- ==========================================================
+                         B1. DASHBOARD SAYFASI
+                         ========================================================== -->
+                    {% if page == 'dashboard' %}
+                        <div class="dashboard-header">
+                            <h2 style="font-family:'Outfit'">Tekrar hoş geldin, {{ session.full_name }}!</h2>
+                            <p class="text-muted">OBS portalındaki güncel üniversite istatistikleri ve durumunuz aşağıda listelenmiştir.</p>
+                        </div>
+
+                        <!-- Kartlar Grid -->
+                        <div class="row g-4 mb-5">
+                            <div class="col-xl-3 col-md-6">
+                                <div class="stat-card">
+                                    <div class="stat-info">
+                                        <h3>{{ data.total_students }}</h3>
+                                        <p>Toplam Öğrenci</p>
+                                    </div>
+                                    <div class="stat-icon" style="background-color: var(--primary-light); color: var(--primary);">
+                                        <i class="fas fa-user-graduate"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-3 col-md-6">
+                                <div class="stat-card">
+                                    <div class="stat-info">
+                                        <h3>{{ data.total_academicians }}</h3>
+                                        <p>Akademisyen</p>
+                                    </div>
+                                    <div class="stat-icon" style="background-color: var(--info-light); color: var(--info);">
+                                        <i class="fas fa-user-tie"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-3 col-md-6">
+                                <div class="stat-card">
+                                    <div class="stat-info">
+                                        <h3>{{ data.total_courses }}</h3>
+                                        <p>Aktif Ders</p>
+                                    </div>
+                                    <div class="stat-icon" style="background-color: var(--warning-light); color: var(--warning);">
+                                        <i class="fas fa-book"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-3 col-md-6">
+                                <div class="stat-card">
+                                    <div class="stat-info">
+                                        <h3>%{{ data.success_rate }}</h3>
+                                        <p>Sistem Başarı Oranı</p>
+                                    </div>
+                                    <div class="stat-icon" style="background-color: var(--success-light); color: var(--success);">
+                                        <i class="fas fa-chart-line"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row g-4">
+                            <!-- Rollere Özel Bilgi Kartı -->
+                            <div class="col-lg-6">
+                                <div class="card border-0 shadow-sm p-4 h-100" style="background-color: var(--bg-card); border-radius: var(--border-radius); border: 1px solid var(--border-color) !important;">
+                                    <h5 class="mb-3 text-primary"><i class="fas fa-info-circle me-2"></i> Kişisel Bilgi Paneli</h5>
+                                    
+                                    {% if session.role == 'student' %}
+                                        <div class="d-flex flex-column gap-3">
+                                            <div class="d-flex justify-content-between border-bottom pb-2">
+                                                <span class="text-muted">Öğrenci Numarası:</span>
+                                                <span class="font-weight-600">{{ session.student_number }}</span>
+                                            </div>
+                                            <div class="d-flex justify-content-between border-bottom pb-2">
+                                                <span class="text-muted">Genel Not Ortalaması (GNO):</span>
+                                                <span class="font-weight-700 text-success">{{ data.student_gpa }} / 4.00</span>
+                                            </div>
+                                            <div class="d-flex justify-content-between border-bottom pb-2">
+                                                <span class="text-muted">Alınan Toplam Ders:</span>
+                                                <span class="font-weight-600">{{ data.student_courses_count }}</span>
+                                            </div>
+                                            <div class="d-flex justify-content-between pb-1">
+                                                <span class="text-muted">Toplam Devamsızlık (Gün):</span>
+                                                <span class="font-weight-600 {% if data.student_absent_count > 4 %}text-danger{% else %}text-muted{% endif %}">{{ data.student_absent_count }} gün</span>
+                                            </div>
+                                        </div>
+                                    {% elif session.role == 'academician' %}
+                                        <div class="d-flex flex-column gap-3">
+                                            <div class="d-flex justify-content-between border-bottom pb-2">
+                                                <span class="text-muted">Bağlı Olduğu Bölüm:</span>
+                                                <span class="font-weight-600">{{ session.department }}</span>
+                                            </div>
+                                            <div class="d-flex justify-content-between border-bottom pb-2">
+                                                <span class="text-muted">Verilen Ders Sayısı:</span>
+                                                <span class="font-weight-600">{{ data.acad_courses_count }}</span>
+                                            </div>
+                                            <div class="d-flex justify-content-between pb-1">
+                                                <span class="text-muted">Toplam Sorumlu Öğrenci:</span>
+                                                <span class="font-weight-600">{{ data.acad_students_count }}</span>
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        <div class="text-center py-4">
+                                            <i class="fas fa-user-shield fs-1 text-danger mb-3"></i>
+                                            <h6>Yönetici Yetkileri Aktif</h6>
+                                            <p class="text-muted" style="font-size:13px;">Kullanıcı ve ders yapılandırma alanlarından sistemi tam yetkiyle yönetebilirsiniz.</p>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <!-- Akademik Takvim / Duyurular -->
+                            <div class="col-lg-6">
+                                <div class="card border-0 shadow-sm p-4 h-100" style="background-color: var(--bg-card); border-radius: var(--border-radius); border: 1px solid var(--border-color) !important;">
+                                    <h5 class="mb-3 text-warning"><i class="fas fa-bullhorn me-2"></i> Sistem Duyuruları</h5>
+                                    
+                                    <div class="d-flex flex-column gap-3">
+                                        <div class="p-3 border-start border-3 border-primary" style="background-color: rgba(0,0,0,0.01); border-radius: 4px;">
+                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                <strong style="font-size: 14px;">Bahar Dönemi Final Sınavları Hakkında</strong>
+                                                <span class="text-muted" style="font-size: 11px;">13.06.2026</span>
+                                            </div>
+                                            <p class="mb-0 text-muted" style="font-size: 12px;">Final sınavları programı ve sınıfları öğrenci paneli üzerinde ders detaylarında açıklanmıştır.</p>
+                                        </div>
+                                        
+                                        <div class="p-3 border-start border-3 border-success" style="background-color: rgba(0,0,0,0.01); border-radius: 4px;">
+                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                <strong style="font-size: 14px;">İleri Programlama Proje Teslimi</strong>
+                                                <span class="text-muted" style="font-size: 11px;">10.06.2026</span>
+                                            </div>
+                                            <p class="mb-0 text-muted" style="font-size: 12px;">Flask ve MySQL tabanlı OBS projelerinizin GitHub linklerini hocanıza iletmeyi unutmayınız.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    <!-- ==========================================================
+                         B2. DERSLER SAYFASI
+                         ========================================================== -->
+                    {% elif page == 'courses' %}
+                        <div class="table-card">
+                            <div class="table-card-header">
+                                <h5 class="table-card-title"><i class="fas fa-list-ul me-2"></i> Dönemlik Ders Listesi</h5>
+                                <div class="search-box-container d-block d-md-none">
+                                    <input type="text" class="search-box-input" placeholder="Ara..." onkeyup="filterTable('global-search', 'courses-table')">
+                                </div>
+                            </div>
+                            
+                            <div class="table-responsive">
+                                <table class="table obs-table" id="courses-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Ders Kodu</th>
+                                            <th>Ders Adı</th>
+                                            <th>Kredi</th>
+                                            <th>Sorumlu Öğretim Elemanı</th>
+                                            {% if session.role == 'academician' %}
+                                                <th>Kayıtlı Öğrenci</th>
+                                            {% endif %}
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for c in data.courses %}
+                                            <tr>
+                                                <td><strong class="text-primary">{{ c.course_code }}</strong></td>
+                                                <td>{{ c.course_name }}</td>
+                                                <td>{{ c.credits }} Kredi</td>
+                                                <td>
+                                                    {% if c.academician_name %}
+                                                        {{ c.academician_name }}
+                                                    {% else %}
+                                                        <span class="text-muted">Hoca Atanmamış</span>
+                                                    {% endif %}
+                                                </td>
+                                                {% if session.role == 'academician' %}
+                                                    <td>
+                                                        <span class="badge bg-secondary px-2.5 py-1.5">{{ c.student_count }} Öğrenci</span>
+                                                    </td>
+                                                {% endif %}
+                                            </tr>
+                                        {% else %}
+                                            <tr>
+                                                <td colspan="5" class="text-center text-muted">Kayıtlı ders bulunamadı.</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                    <!-- ==========================================================
+                         B3. NOTLAR SAYFASI
+                         ========================================================== -->
+                    {% elif page == 'grades' %}
+                        {% if session.role == 'academician' %}
+                            <!-- Akademisyen Not Giriş Ekranı -->
+                            <div class="card border-0 shadow-sm p-4 mb-4" style="background-color: var(--bg-card); border-radius: var(--border-radius);">
+                                <h5 class="mb-3"><i class="fas fa-filter me-2"></i> Not Girişi Yapılacak Dersi Seçin</h5>
+                                <form action="{{ url_for('index') }}" method="GET">
+                                    <input type="hidden" name="page" value="grades">
+                                    <div class="row g-3 align-items-center">
+                                        <div class="col-md-6 col-lg-4">
+                                            <select name="course_id" class="form-select" onchange="this.form.submit()">
+                                                <option value="">-- Ders Seçiniz --</option>
+                                                {% for c in data.my_courses %}
+                                                    <option value="{{ c.id }}" {% if data.selected_course_id|string == c.id|string %}selected{% endif %}>
+                                                        {{ c.course_code }} - {{ c.course_name }}
+                                                    </option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+
+                            {% if data.selected_course_id %}
+                                <div class="table-card">
+                                    <div class="table-card-header">
+                                        <h5 class="table-card-title"><i class="fas fa-users me-2"></i> Öğrenci Not Listesi</h5>
+                                    </div>
+                                    <div class="table-responsive">
+                                        <table class="table obs-table" id="grades-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Öğrenci No</th>
+                                                    <th>Adı Soyadı</th>
+                                                    <th>Vize (%30)</th>
+                                                    <th>Final (%40)</th>
+                                                    <th>Proje (%20)</th>
+                                                    <th>Sunum (%10)</th>
+                                                    <th>Ortalama</th>
+                                                    <th>Harf Notu</th>
+                                                    <th>İşlemler</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for s in data.student_grades %}
+                                                    <tr>
+                                                        <td>{{ s.student_number }}</td>
+                                                        <td>
+                                                            <!-- Profil Popover / Modal -->
+                                                            <a href="javascript:void(0)" onclick="viewStudentProfile('{{ s.student_id }}')" class="font-weight-600 text-decoration-none">
+                                                                {{ s.student_name }}
+                                                            </a>
+                                                        </td>
+                                                        <td>{{ s.midterm if s.midterm is not none else '-' }}</td>
+                                                        <td>{{ s.final if s.final is not none else '-' }}</td>
+                                                        <td>{{ s.project if s.project is not none else '-' }}</td>
+                                                        <td>{{ s.presentation if s.presentation is not none else '-' }}</td>
+                                                        <td>
+                                                            <strong>{{ s.average if s.average is not none else '-' }}</strong>
+                                                        </td>
+                                                        <td>
+                                                            {% if s.letter_grade %}
+                                                                <span class="grade-badge grade-{{ s.letter_grade }}">{{ s.letter_grade }}</span>
+                                                            {% else %}
+                                                                <span class="grade-badge grade-empty">-</span>
+                                                            {% endif %}
+                                                        </td>
+                                                        <td>
+                                                            <button class="btn btn-sm btn-primary" onclick="openGradeModal('{{ s.student_course_id }}', '{{ s.student_name }}', '{{ s.midterm }}', '{{ s.final }}', '{{ s.project }}', '{{ s.presentation }}')">
+                                                                <i class="fas fa-edit"></i> Not Gir
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                {% else %}
+                                                    <tr>
+                                                        <td colspan="9" class="text-center text-muted">Bu derse kayıtlı öğrenci bulunamadı.</td>
+                                                    </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            {% endif %}
+
+                        {% elif session.role == 'student' %}
+                            <!-- Öğrenci Kendi Not Görüntüleme -->
+                            <div class="table-card">
+                                <div class="table-card-header">
+                                    <h5 class="table-card-title"><i class="fas fa-award me-2"></i> Dönem Not Kartınız</h5>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table obs-table" id="grades-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Ders Kodu</th>
+                                                <th>Ders Adı</th>
+                                                <th>Kredi</th>
+                                                <th>Vize (%30)</th>
+                                                <th>Final (%40)</th>
+                                                <th>Proje (%20)</th>
+                                                <th>Sunum (%10)</th>
+                                                <th>Ortalama</th>
+                                                <th>Harf Notu</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for g in data.grades %}
+                                                <tr>
+                                                    <td><strong class="text-primary">{{ g.course_code }}</strong></td>
+                                                    <td>{{ g.course_name }}</td>
+                                                    <td>{{ g.credits }}</td>
+                                                    <td>{{ g.midterm if g.midterm is not none else '-' }}</td>
+                                                    <td>{{ g.final if g.final is not none else '-' }}</td>
+                                                    <td>{{ g.project if g.project is not none else '-' }}</td>
+                                                    <td>{{ g.presentation if g.presentation is not none else '-' }}</td>
+                                                    <td><strong>{{ g.average if g.average is not none else '-' }}</strong></td>
+                                                    <td>
+                                                        {% if g.letter_grade %}
+                                                            <span class="grade-badge grade-{{ g.letter_grade }}">{{ g.letter_grade }}</span>
+                                                        {% else %}
+                                                            <span class="grade-badge grade-empty">-</span>
+                                                        {% endif %}
+                                                    </td>
+                                                </tr>
+                                            {% else %}
+                                                <tr>
+                                                    <td colspan="9" class="text-center text-muted">Henüz kayıtlı notunuz bulunmamaktadır.</td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        {% else %}
+                            <!-- Admin Not İzleme Ekranı -->
+                            <div class="table-card">
+                                <div class="table-card-header">
+                                    <h5 class="table-card-title"><i class="fas fa-award me-2"></i> Sistemdeki Tüm Notlar</h5>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table obs-table" id="grades-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Öğrenci No</th>
+                                                <th>Öğrenci Adı</th>
+                                                <th>Ders Kodu</th>
+                                                <th>Ders Adı</th>
+                                                <th>Ortalama</th>
+                                                <th>Harf Notu</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for g in data.grades %}
+                                                <tr>
+                                                    <td>{{ g.student_number }}</td>
+                                                    <td>{{ g.student_name }}</td>
+                                                    <td>{{ g.course_code }}</td>
+                                                    <td>{{ g.course_name }}</td>
+                                                    <td>{{ g.average if g.average is not none else '-' }}</td>
+                                                    <td>
+                                                        {% if g.letter_grade %}
+                                                            <span class="grade-badge grade-{{ g.letter_grade }}">{{ g.letter_grade }}</span>
+                                                        {% else %}
+                                                            <span class="grade-badge grade-empty">-</span>
+                                                        {% endif %}
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                    <!-- ==========================================================
+                         B4. DEVAMSIZLIK SAYFASI
+                         ========================================================== -->
+                    {% elif page == 'attendance' %}
+                        {% if session.role == 'academician' %}
+                            <!-- Akademisyen Devamsızlık Giriş Ekranı -->
+                            <div class="card border-0 shadow-sm p-4 mb-4" style="background-color: var(--bg-card); border-radius: var(--border-radius);">
+                                <h5 class="mb-3"><i class="fas fa-filter me-2"></i> Devamsızlık Girilecek Dersi Seçin</h5>
+                                <form action="{{ url_for('index') }}" method="GET">
+                                    <input type="hidden" name="page" value="attendance">
+                                    <div class="row g-3 align-items-center">
+                                        <div class="col-md-6 col-lg-4">
+                                            <select name="course_id" class="form-select" onchange="this.form.submit()">
+                                                <option value="">-- Ders Seçiniz --</option>
+                                                {% for c in data.my_courses %}
+                                                    <option value="{{ c.id }}" {% if data.selected_course_id|string == c.id|string %}selected{% endif %}>
+                                                        {{ c.course_code }} - {{ c.course_name }}
+                                                    </option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+
+                            {% if data.selected_course_id %}
+                                <div class="table-card">
+                                    <div class="table-card-header">
+                                        <h5 class="table-card-title"><i class="fas fa-users me-2"></i> Devamsızlık Bilgileri</h5>
+                                    </div>
+                                    <div class="table-responsive">
+                                        <table class="table obs-table" id="attendance-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Öğrenci No</th>
+                                                    <th>Adı Soyadı</th>
+                                                    <th>Girilen Toplam Hafta</th>
+                                                    <th>Gelmediği Hafta Sayısı</th>
+                                                    <th>Devam Durumu</th>
+                                                    <th>İşlem</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for s in data.students_attendance %}
+                                                    <tr>
+                                                        <td>{{ s.student_number }}</td>
+                                                        <td>{{ s.student_name }}</td>
+                                                        <td>{{ s.total_weeks }} Hafta</td>
+                                                        <td class="{% if s.absent_count > 4 %}text-danger font-weight-700{% endif %}">
+                                                            {{ s.absent_count }} Hafta
+                                                        </td>
+                                                        <td>
+                                                            {% if s.total_weeks > 0 %}
+                                                                {% set pct = ((s.total_weeks - s.absent_count) * 100 / s.total_weeks)|round %}
+                                                                <span class="badge {% if pct >= 70 %}bg-success-light text-success{% else %}bg-danger-light text-danger{% endif %} px-2.5 py-1.5">
+                                                                    %{{ pct }} Devam
+                                                                </span>
+                                                            {% else %}
+                                                                <span class="text-muted">-</span>
+                                                            {% endif %}
+                                                        </td>
+                                                        <td>
+                                                            <button class="btn btn-sm btn-outline-primary" onclick="openAttendanceModal('{{ s.student_course_id }}', '{{ s.student_name }}')">
+                                                                <i class="fas fa-calendar-check"></i> Devamsızlık Yönet
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                {% else %}
+                                                    <tr>
+                                                        <td colspan="6" class="text-center text-muted">Bu derse kayıtlı öğrenci bulunamadı.</td>
+                                                    </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            {% endif %}
+
+                        {% elif session.role == 'student' %}
+                            <!-- Öğrencinin Kendi Devamsızlık Kartı -->
+                            <div class="table-card mb-4">
+                                <div class="table-card-header">
+                                    <h5 class="table-card-title"><i class="fas fa-chart-line me-2"></i> Devamsızlık Özetiniz</h5>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table obs-table" id="attendance-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Ders Kodu</th>
+                                                <th>Ders Adı</th>
+                                                <th>Girilen Hafta</th>
+                                                <th>Devamsız Hafta</th>
+                                                <th>Yüzde Durumu</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for s in data.summary %}
+                                                <tr>
+                                                    <td><strong class="text-primary">{{ s.course_code }}</strong></td>
+                                                    <td>{{ s.course_name }}</td>
+                                                    <td>{{ s.total_weeks }} Hafta</td>
+                                                    <td class="{% if s.absent_count > 4 %}text-danger font-weight-700{% endif %}">{{ s.absent_count }} Gün / Hafta</td>
+                                                    <td>
+                                                        {% if s.total_weeks > 0 %}
+                                                            {% set pct = ((s.total_weeks - s.absent_count) * 100 / s.total_weeks)|round %}
+                                                            <div class="d-flex align-items-center gap-2">
+                                                                <span class="badge {% if pct >= 70 %}bg-success-light text-success{% else %}bg-danger-light text-danger{% endif %} px-2.5 py-1.5">
+                                                                    %{{ pct }}
+                                                                </span>
+                                                                <div class="progress" style="width: 100px; height: 6px;">
+                                                                    <div class="progress-bar {% if pct >= 70 %}bg-success{% else %}bg-danger{% endif %}" role="progressbar" style="width: {{ pct }}%"></div>
+                                                                </div>
+                                                            </div>
+                                                        {% else %}
+                                                            <span class="text-muted">-</span>
+                                                        {% endif %}
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        {% else %}
+                            <!-- Admin Devamsızlık İzleme -->
+                            <div class="table-card">
+                                <div class="table-card-header">
+                                    <h5 class="table-card-title"><i class="fas fa-calendar-check me-2"></i> Tüm Devamsızlık Kayıtları</h5>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table obs-table" id="attendance-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Öğrenci No</th>
+                                                <th>Öğrenci Adı</th>
+                                                <th>Ders Kodu</th>
+                                                <th>Ders Adı</th>
+                                                <th>Toplam Devamsız Hafta</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for a in data.attendance %}
+                                                <tr>
+                                                    <td>{{ a.student_number }}</td>
+                                                    <td>{{ a.student_name }}</td>
+                                                    <td>{{ a.course_code }}</td>
+                                                    <td>{{ a.course_name }}</td>
+                                                    <td class="{% if a.absent_count > 4 %}text-danger font-weight-700{% endif %}">{{ a.absent_count }} Hafta</td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                    <!-- ==========================================================
+                         B5. KULLANICI YÖNETİMİ SAYFASI (ADMIN)
+                         ========================================================== -->
+                    {% elif page == 'users' %}
+                        <!-- Tab Butonları -->
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <ul class="nav nav-pills" id="pills-tab" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active me-2" id="pills-students-tab" data-bs-toggle="pill" data-bs-target="#pills-students" type="button" role="tab">
+                                        <i class="fas fa-user-graduate me-2"></i> Öğrenciler
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="pills-teachers-tab" data-bs-toggle="pill" data-bs-target="#pills-teachers" type="button" role="tab">
+                                        <i class="fas fa-user-tie me-2"></i> Akademisyenler
+                                    </button>
+                                </li>
+                            </ul>
+                            
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#studentAddModal">
+                                    <i class="fas fa-plus me-2"></i> Öğrenci Ekle
+                                </button>
+                                <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#teacherAddModal">
+                                    <i class="fas fa-plus me-2"></i> Akademisyen Ekle
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="tab-content" id="pills-tabContent">
+                            <!-- Öğrenci Tab Bölümü -->
+                            <div class="tab-pane fade show active" id="pills-students" role="tabpanel">
+                                <div class="table-card">
+                                    <div class="table-card-header">
+                                        <h5 class="table-card-title">Sistemde Kayıtlı Öğrenciler</h5>
+                                    </div>
+                                    <div class="table-responsive">
+                                        <table class="table obs-table" id="students-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Öğrenci No</th>
+                                                    <th>Kullanıcı Adı</th>
+                                                    <th>Adı Soyadı</th>
+                                                    <th>E-posta Adresi</th>
+                                                    <th>Genel Ort. (GNO)</th>
+                                                    <th class="text-end">İşlemler</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for s in data.students %}
+                                                    <tr>
+                                                        <td><strong>{{ s.student_number }}</strong></td>
+                                                        <td>{{ s.username }}</td>
+                                                        <td>{{ s.first_name }} {{ s.last_name }}</td>
+                                                        <td>{{ s.email }}</td>
+                                                        <td><span class="badge bg-success-light text-success px-2.5 py-1.5">{{ s.gpa }}</span></td>
+                                                        <td class="text-end">
+                                                            <form action="{{ url_for('admin_delete_user', user_id=s.user_id) }}" method="POST" class="d-inline" onsubmit="return confirm('Bu öğrenciyi ve tüm kayıtlarını silmek istediğinize emin misiniz?');">
+                                                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                                    <i class="fas fa-trash-alt"></i> Sil
+                                                                </button>
+                                                            </form>
+                                                        </td>
+                                                    </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Akademisyen Tab Bölümü -->
+                            <div class="tab-pane fade" id="pills-teachers" role="tabpanel">
+                                <div class="table-card">
+                                    <div class="table-card-header">
+                                        <h5 class="table-card-title">Sistemde Kayıtlı Akademisyenler</h5>
+                                    </div>
+                                    <div class="table-responsive">
+                                        <table class="table obs-table" id="teachers-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Ünvan / Adı Soyadı</th>
+                                                    <th>Kullanıcı Adı</th>
+                                                    <th>E-posta Adresi</th>
+                                                    <th>Bağlı Departman</th>
+                                                    <th class="text-end">İşlemler</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for a in data.academicians %}
+                                                    <tr>
+                                                        <td><strong>{{ a.title }} {{ a.first_name }} {{ a.last_name }}</strong></td>
+                                                        <td>{{ a.username }}</td>
+                                                        <td>{{ a.email }}</td>
+                                                        <td>{{ a.department }}</td>
+                                                        <td class="text-end">
+                                                            <form action="{{ url_for('admin_delete_user', user_id=a.user_id) }}" method="POST" class="d-inline" onsubmit="return confirm('Bu akademisyeni silmek istediğinize emin misiniz?');">
+                                                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                                    <i class="fas fa-trash-alt"></i> Sil
+                                                                </button>
+                                                            </form>
+                                                        </td>
+                                                    </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    <!-- ==========================================================
+                         B6. DERS YÖNETİMİ SAYFASI (ADMIN)
+                         ========================================================== -->
+                    {% elif page == 'courses_mgmt' %}
+                        <div class="row g-4">
+                            <!-- Sol Sütun: Derslerin Listesi ve Silinmesi -->
+                            <div class="col-lg-7">
+                                <div class="table-card">
+                                    <div class="table-card-header">
+                                        <h5 class="table-card-title"><i class="fas fa-book me-2"></i> Sistemdeki Dersler</h5>
+                                    </div>
+                                    <div class="table-responsive">
+                                        <table class="table obs-table" id="courses-mgmt-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Kod</th>
+                                                    <th>Ders İsmi</th>
+                                                    <th>Kredi</th>
+                                                    <th>Hocası</th>
+                                                    <th class="text-end">İşlem</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for c in data.courses %}
+                                                    <tr>
+                                                        <td><strong class="text-primary">{{ c.course_code }}</strong></td>
+                                                        <td>{{ c.course_name }}</td>
+                                                        <td>{{ c.credits }}</td>
+                                                        <td>{{ c.academician_name if c.academician_name else 'Hoca atanmamış' }}</td>
+                                                        <td class="text-end">
+                                                            <form action="{{ url_for('admin_delete_course', course_id=c.id) }}" method="POST" onsubmit="return confirm('Bu dersi silmek istediğinizden emin misiniz?');">
+                                                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                                    <i class="fas fa-trash-alt"></i>
+                                                                </button>
+                                                            </form>
+                                                        </td>
+                                                    </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Sağ Sütun: Ders Ekleme ve İlişkilendirmeler -->
+                            <div class="col-lg-5">
+                                <!-- Ders Ekle -->
+                                <div class="card border-0 shadow-sm p-4 mb-4" style="background-color: var(--bg-card); border-radius: var(--border-radius); border: 1px solid var(--border-color) !important;">
+                                    <h5 class="mb-3 text-primary"><i class="fas fa-plus me-2"></i> Yeni Ders Ekle</h5>
+                                    <form action="{{ url_for('admin_add_course') }}" method="POST">
+                                        <div class="row g-3">
+                                            <div class="col-6">
+                                                <label class="form-label" style="font-size:13px;">Ders Kodu</label>
+                                                <input type="text" class="form-control" name="course_code" placeholder="Örn: BM407" required>
+                                            </div>
+                                            <div class="col-6">
+                                                <label class="form-label" style="font-size:13px;">Ders Kredisi</label>
+                                                <input type="number" class="form-control" name="credits" min="1" max="10" placeholder="3" required>
+                                            </div>
+                                            <div class="col-12">
+                                                <label class="form-label" style="font-size:13px;">Ders İsmi</label>
+                                                <input type="text" class="form-control" name="course_name" placeholder="Örn: İleri Programlama" required>
+                                            </div>
+                                            <div class="col-12">
+                                                <label class="form-label" style="font-size:13px;">Sorumlu Hoca</label>
+                                                <select name="academician_id" class="form-select">
+                                                    <option value="">Seçilmedi (Atanmayacak)</option>
+                                                    {% for a in data.academicians %}
+                                                        <option value="{{ a.id }}">{{ a.name }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                            <div class="col-12">
+                                                <button type="submit" class="btn btn-primary w-100">Ders Oluştur</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                                
+                                <!-- Akademisyene Ders Ata -->
+                                <div class="card border-0 shadow-sm p-4 mb-4" style="background-color: var(--bg-card); border-radius: var(--border-radius); border: 1px solid var(--border-color) !important;">
+                                    <h5 class="mb-3 text-info"><i class="fas fa-user-tie me-2"></i> Derse Hoca Ata</h5>
+                                    <form action="{{ url_for('admin_assign_academician') }}" method="POST">
+                                        <div class="row g-3">
+                                            <div class="col-12">
+                                                <label class="form-label" style="font-size:13px;">Ders Seçin</label>
+                                                <select name="course_id" class="form-select" required>
+                                                    <option value="">-- Ders Seçin --</option>
+                                                    {% for c in data.courses %}
+                                                        <option value="{{ c.id }}">{{ c.course_code }} - {{ c.course_name }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                            <div class="col-12">
+                                                <label class="form-label" style="font-size:13px;">Atanacak Hoca</label>
+                                                <select name="academician_id" class="form-select">
+                                                    <option value="">Boşta Bırak (Kaldır)</option>
+                                                    {% for a in data.academicians %}
+                                                        <option value="{{ a.id }}">{{ a.name }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                            <div class="col-12">
+                                                <button type="submit" class="btn btn-info w-100 text-white">Hocayı Ata</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                                
+                                <!-- Öğrenciyi Derse Kaydet -->
+                                <div class="card border-0 shadow-sm p-4" style="background-color: var(--bg-card); border-radius: var(--border-radius); border: 1px solid var(--border-color) !important;">
+                                    <h5 class="mb-3 text-success"><i class="fas fa-user-plus me-2"></i> Öğrenciyi Derse Kaydet</h5>
+                                    <form action="{{ url_for('admin_enroll_student') }}" method="POST">
+                                        <div class="row g-3">
+                                            <div class="col-12">
+                                                <label class="form-label" style="font-size:13px;">Ders Seçin</label>
+                                                <select name="course_id" class="form-select" required>
+                                                    <option value="">-- Ders Seçin --</option>
+                                                    {% for c in data.courses %}
+                                                        <option value="{{ c.id }}">{{ c.course_code }} - {{ c.course_name }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                            <div class="col-12">
+                                                <label class="form-label" style="font-size:13px;">Öğrenci Seçin</label>
+                                                <select name="student_id" class="form-select" required>
+                                                    <option value="">-- Öğrenci Seçin --</option>
+                                                    {% for s in data.students %}
+                                                        <option value="{{ s.id }}">{{ s.student_number }} - {{ s.name }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                            <div class="col-12">
+                                                <button type="submit" class="btn btn-success w-100">Öğrenciyi Kaydet</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                </div>
+            </div>
+        </div>
+
+        <!-- ====================================================================
+             C. MODALLAR (PENCERELER)
+             ==================================================================== -->
+
+        <!-- C1. AKADEMİSYEN: NOT GİRİŞ MODALIPENCERESİ -->
+        <div class="modal fade" id="gradeModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title"><i class="fas fa-edit me-2"></i> Not Güncelleme</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                    </div>
+                    <form action="{{ url_for('acad_update_grades') }}" method="POST">
+                        <div class="modal-body">
+                            <input type="hidden" name="student_course_id" id="modal_sc_id">
+                            <input type="hidden" name="course_id" value="{{ data.selected_course_id }}">
+                            
+                            <div class="mb-3">
+                                <strong>Öğrenci:</strong> <span id="modal_student_name"></span>
+                            </div>
+                            
+                            <div class="row g-3">
+                                <div class="col-6">
+                                    <label class="form-label">Vize Notu (%30)</label>
+                                    <input type="number" class="form-control" name="midterm" id="modal_midterm" min="0" max="100" step="0.01" placeholder="Vize Notu">
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label">Final Notu (%40)</label>
+                                    <input type="number" class="form-control" name="final" id="modal_final" min="0" max="100" step="0.01" placeholder="Final Notu">
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label">Proje Notu (%20)</label>
+                                    <input type="number" class="form-control" name="project" id="modal_project" min="0" max="100" step="0.01" placeholder="Proje Notu">
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label">Sunum Notu (%10)</label>
+                                    <input type="number" class="form-control" name="presentation" id="modal_presentation" min="0" max="100" step="0.01" placeholder="Sunum Notu">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                            <button type="submit" class="btn btn-primary">Kaydet</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- C2. AKADEMİSYEN: DEVAMSIZLIK MODALI -->
+        <div class="modal fade" id="attendanceModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title"><i class="fas fa-calendar-check me-2"></i> Haftalık Devamsızlık Yönetimi</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                    </div>
+                    <form action="{{ url_for('acad_update_attendance') }}" method="POST">
+                        <div class="modal-body">
+                            <input type="hidden" name="student_course_id" id="attend_sc_id">
+                            <input type="hidden" name="course_id" value="{{ data.selected_course_id }}">
+                            
+                            <div class="mb-3">
+                                <strong>Öğrenci Adı:</strong> <span id="attend_student_name"></span>
+                            </div>
+                            
+                            <p class="text-muted" style="font-size:13px;">Kutucuk işaretli ise öğrenci o derse <b>Gelmş (Derste Var)</b> kabul edilir. Boş bırakılırsa <b>Devamsız</b> sayılır.</p>
+                            
+                            <div class="row g-3" id="attendance-weeks-grid">
+                                <!-- JS ile 1-14. haftaların checkbox elemanları buraya yüklenecektir -->
+                                {% for w in range(1, 15) %}
+                                    <div class="col-md-3 col-6">
+                                        <div class="form-check form-switch p-3 border rounded">
+                                            <input class="form-check-input ms-0 me-2" type="checkbox" name="week_{{ w }}" value="Present" id="week_box_{{ w }}" checked>
+                                            <label class="form-check-label font-weight-600" for="week_box_{{ w }}">{{ w }}. Hafta</label>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                            <button type="submit" class="btn btn-primary">Kaydet</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- C3. AKADEMİSYEN: ÖĞRENCİ DETAY PROFILLERİ (AJAX POPUP) -->
+        <div class="modal fade" id="profileModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title"><i class="fas fa-user-graduate me-2"></i> Öğrenci Detaylı Akademik Kartı</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="d-flex align-items-center gap-3 mb-4">
+                            <div class="user-avatar" style="width:60px; height:60px; font-size:24px;" id="profile_avatar">
+                                ST
+                            </div>
+                            <div>
+                                <h4 class="mb-0" id="profile_name">Ali Yılmaz</h4>
+                                <div class="text-muted" style="font-size:13px;">
+                                    <span id="profile_number">2026001</span> | <span id="profile_email">ali@obs.edu.tr</span>
+                                </div>
+                            </div>
+                            <div class="ms-auto text-end">
+                                <div class="text-muted" style="font-size:11px; text-transform:uppercase;">Genel Not Ortalaması</div>
+                                <h2 class="text-success mb-0 font-weight-800" id="profile_gpa">3.25</h2>
+                            </div>
+                        </div>
+                        
+                        <div class="row g-4">
+                            <!-- Aldığı Dersler -->
+                            <div class="col-md-7 border-end">
+                                <h6 class="mb-3 text-primary"><i class="fas fa-book me-2"></i> Aldığı Dersler ve Notlar</h6>
+                                <div class="table-responsive" style="max-height: 250px; overflow-y: auto;">
+                                    <table class="table table-sm text-start" style="font-size:13px;">
+                                        <thead>
+                                            <tr>
+                                                <th>Ders</th>
+                                                <th>Kredi</th>
+                                                <th>Harf</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="profile_courses_list">
+                                            <!-- AJAX ile doldurulacak -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            
+                            <!-- Devamsızlık Bilgileri -->
+                            <div class="col-md-5">
+                                <h6 class="mb-3 text-warning"><i class="fas fa-calendar-check me-2"></i> Ders Devamsızlık Durumu</h6>
+                                <div class="table-responsive" style="max-height: 250px; overflow-y: auto;">
+                                    <table class="table table-sm text-start" style="font-size:13px;">
+                                        <thead>
+                                            <tr>
+                                                <th>Ders</th>
+                                                <th>Gelmeme Sayısı</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="profile_attendance_list">
+                                            <!-- AJAX ile doldurulacak -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- C4. ADMIN: ÖĞRENCİ EKLEME MODALI -->
+        <div class="modal fade" id="studentAddModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title"><i class="fas fa-user-graduate me-2"></i> Yeni Öğrenci Ekle</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                    </div>
+                    <form action="{{ url_for('admin_add_user') }}" method="POST" autocomplete="off">
+                        <input type="hidden" name="user_type" value="student">
+                        <div class="modal-body">
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <label class="form-label" style="font-size:13px;">Öğrenci Numarası</label>
+                                    <input type="text" class="form-control" name="student_number" placeholder="Örn: 2026011" required>
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label" style="font-size:13px;">Öğrenci Adı</label>
+                                    <input type="text" class="form-control" name="first_name" placeholder="Örn: Hasan" required>
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label" style="font-size:13px;">Soyadı</label>
+                                    <input type="text" class="form-control" name="last_name" placeholder="Örn: Şen" required>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label" style="font-size:13px;">Kullanıcı Adı</label>
+                                    <input type="text" class="form-control" name="username" placeholder="Sisteme giriş adı" required>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label" style="font-size:13px;">E-posta Adresi</label>
+                                    <input type="email" class="form-control" name="email" placeholder="hasan@obs.edu.tr" required>
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label" style="font-size:13px;">Parola</label>
+                                    <input type="password" class="form-control" name="password" placeholder="Parola belirleyin" required>
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label" style="font-size:13px;">Başlangıç GNO (Ortalama)</label>
+                                    <input type="number" class="form-control" name="gpa" min="0" max="4" step="0.01" value="0.00">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                            <button type="submit" class="btn btn-primary">Kaydet</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- C5. ADMIN: AKADEMİSYEN EKLEME MODALI -->
+        <div class="modal fade" id="teacherAddModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title"><i class="fas fa-user-tie me-2"></i> Yeni Akademisyen Ekle</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                    </div>
+                    <form action="{{ url_for('admin_add_user') }}" method="POST" autocomplete="off">
+                        <input type="hidden" name="user_type" value="academician">
+                        <div class="modal-body">
+                            <div class="row g-3">
+                                <div class="col-4">
+                                    <label class="form-label" style="font-size:13px;">Ünvan</label>
+                                    <select class="form-select" name="title" required>
+                                        <option value="Prof. Dr.">Prof. Dr.</option>
+                                        <option value="Doç. Dr.">Doç. Dr.</option>
+                                        <option value="Dr. Öğr. Üyesi">Dr. Öğr. Üyesi</option>
+                                        <option value="Öğr. Gör.">Öğr. Gör.</option>
+                                    </select>
+                                </div>
+                                <div class="col-4">
+                                    <label class="form-label" style="font-size:13px;">Adı</label>
+                                    <input type="text" class="form-control" name="first_name" placeholder="Murat" required>
+                                </div>
+                                <div class="col-4">
+                                    <label class="form-label" style="font-size:13px;">Soyadı</label>
+                                    <input type="text" class="form-control" name="last_name" placeholder="Ak" required>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label" style="font-size:13px;">Bağlı Bölüm / Departman</label>
+                                    <input type="text" class="form-control" name="department" placeholder="Bilgisayar Mühendisliği" required>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label" style="font-size:13px;">Kullanıcı Adı</label>
+                                    <input type="text" class="form-control" name="username" placeholder="Giriş kullanıcı adı" required>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label" style="font-size:13px;">E-posta Adresi</label>
+                                    <input type="email" class="form-control" name="email" placeholder="murat@obs.edu.tr" required>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label" style="font-size:13px;">Giriş Parolası</label>
+                                    <input type="password" class="form-control" name="password" placeholder="Hoca parolası belirleyin" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                            <button type="submit" class="btn btn-primary">Kaydet</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    {% endif %}
+
+    <!-- ====================================================================
+         D. JAVASCRIPT KONTROLLERİ VE AJAX
+         ==================================================================== -->
+    
+    <!-- Bootstrap 5 JS Bundle CDN (Popper ile birlikte) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // -------------------------------------------------------------
+        // D1. TEMA DEĞİŞİM SİSTEMİ (LIGHT/DARK MODE)
+        // -------------------------------------------------------------
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            updateThemeIcon(savedTheme);
+        });
+
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
+        }
+
+        function updateThemeIcon(theme) {
+            const icons = document.querySelectorAll('#theme-icon');
+            icons.forEach(icon => {
+                if (theme === 'dark') {
+                    icon.className = 'fas fa-sun';
+                } else {
+                    icon.className = 'fas fa-moon';
+                }
+            });
+        }
+
+        // -------------------------------------------------------------
+        // D2. YAN MENÜ KATLAMA SİSTEMİ (SIDEBAR TOGGLE - MOBİL)
+        // -------------------------------------------------------------
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            if (sidebar) {
+                sidebar.classList.toggle('show');
+            }
+        }
+
+        // -------------------------------------------------------------
+        // D3. NOT DEĞERLERİNİ MODALA TAŞIMA (AKADEMİSYEN)
+        // -------------------------------------------------------------
+        function openGradeModal(studentCourseId, studentName, midterm, final, project, presentation) {
+            document.getElementById('modal_sc_id').value = studentCourseId;
+            document.getElementById('modal_student_name').innerText = studentName;
+            
+            // Eğer veritabanından 'None' geliyorsa boş yap, yoksa sayısal değeri ata
+            document.getElementById('modal_midterm').value = (midterm && midterm !== 'None') ? midterm : '';
+            document.getElementById('modal_final').value = (final && final !== 'None') ? final : '';
+            document.getElementById('modal_project').value = (project && project !== 'None') ? project : '';
+            document.getElementById('modal_presentation').value = (presentation && presentation !== 'None') ? presentation : '';
+            
+            const gradeModal = new bootstrap.Modal(document.getElementById('gradeModal'));
+            gradeModal.show();
+        }
+
+        // -------------------------------------------------------------
+        // D4. DEVAMSIZLIK MODALINI AÇMA VE VERİ ÇEKME (AKADEMİSYEN)
+        // -------------------------------------------------------------
+        function openAttendanceModal(studentCourseId, studentName) {
+            document.getElementById('attend_sc_id').value = studentCourseId;
+            document.getElementById('attend_student_name').innerText = studentName;
+            
+            // Tüm haftaların checkboxlarını başlangıçta işaretle (Present)
+            for (let w = 1; w <= 14; w++) {
+                const box = document.getElementById(`week_box_${w}`);
+                if (box) box.checked = true;
+            }
+
+            // AJAX ile veritabanındaki kayıtları çek
+            fetch(`/academician/get-attendance/${studentCourseId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        data.records.forEach(rec => {
+                            const box = document.getElementById(`week_box_${rec.week_number}`);
+                            if (box) {
+                                // Eğer status Present ise checked=true, Absent ise checked=false
+                                box.checked = (rec.status === 'Present');
+                            }
+                        });
+                        
+                        const attendModal = new bootstrap.Modal(document.getElementById('attendanceModal'));
+                        attendModal.show();
+                    } else {
+                        alert("Hata: " + data.message);
+                    }
+                })
+                .catch(err => {
+                    console.error("Devamsızlık çekilemedi:", err);
+                    // Yine de modalı varsayılanlarla aç
+                    const attendModal = new bootstrap.Modal(document.getElementById('attendanceModal'));
+                    attendModal.show();
+                });
+        }
+
+        // -------------------------------------------------------------
+        // D5. ÖĞRENCİ DETAY PROFİLİNİ DİNAMİK GETİRME (AJAX)
+        // -------------------------------------------------------------
+        function viewStudentProfile(studentId) {
+            fetch(`/student/profile/${studentId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const s = data.student;
+                        document.getElementById('profile_name').innerText = `${s.first_name} ${s.last_name}`;
+                        document.getElementById('profile_number').innerText = s.student_number;
+                        document.getElementById('profile_email').innerText = s.email;
+                        document.getElementById('profile_gpa').innerText = s.gpa;
+                        document.getElementById('profile_avatar').innerText = `${s.first_name[0]}${s.last_name[0]}`.toUpperCase();
+                        
+                        // Ders listesi
+                        const coursesList = document.getElementById('profile_courses_list');
+                        coursesList.innerHTML = '';
+                        data.courses.forEach(c => {
+                            const badgeClass = c.letter_grade ? `grade-${c.letter_grade}` : 'grade-empty';
+                            const letter = c.letter_grade || '-';
+                            coursesList.innerHTML += `
+                                <tr>
+                                    <td><strong>${c.course_code}</strong> - ${c.course_name}</td>
+                                    <td>${c.credits}</td>
+                                    <td><span class="grade-badge ${badgeClass}">${letter}</span></td>
+                                </tr>
+                            `;
+                        });
+                        
+                        // Devamsızlık özeti
+                        const attendanceList = document.getElementById('profile_attendance_list');
+                        attendanceList.innerHTML = '';
+                        data.attendance.forEach(a => {
+                            const color = a.absent_weeks > 4 ? 'text-danger font-weight-700' : '';
+                            attendanceList.innerHTML += `
+                                <tr>
+                                    <td><strong>${a.course_code}</strong></td>
+                                    <td class="${color}">${a.absent_weeks} Gün / Hafta</td>
+                                </tr>
+                            `;
+                        });
+
+                        const profileModal = new bootstrap.Modal(document.getElementById('profileModal'));
+                        profileModal.show();
+                    } else {
+                        alert("Profil yüklenirken hata oluştu: " + data.message);
+                    }
+                })
+                .catch(err => {
+                    console.error("Profil verisi çekme hatası:", err);
+                });
+        }
+
+        // -------------------------------------------------------------
+        // D6. ARAMA VE FİLTRELEME SİSTEMİ (LIGHTWEIGHT CLIENT-SIDE SEARCH)
+        // -------------------------------------------------------------
+        function filterAllTables() {
+            const searchInput = document.getElementById('global-search');
+            if (!searchInput) return;
+            const filter = searchInput.value.toUpperCase();
+            
+            // Aktif olan tüm tabloları filtrele (Sınıf ismi .obs-table olanlar)
+            const tables = document.querySelectorAll('.obs-table');
+            tables.forEach(table => {
+                const tr = table.getElementsByTagName("tr");
+                for (let i = 1; i < tr.length; i++) { // Header'ı atla
+                    let visible = false;
+                    const tds = tr[i].getElementsByTagName("td");
+                    for (let j = 0; j < tds.length; j++) {
+                        if (tds[j]) {
+                            const text = tds[j].textContent || tds[j].innerText;
+                            if (text.toUpperCase().indexOf(filter) > -1) {
+                                visible = true;
+                                break;
+                            }
+                        }
+                    }
+                    tr[i].style.display = visible ? "" : "none";
+                }
+            });
+        }
+
+        // Sidebar/Üst arama alanı çakışması için mobil destek
+        function filterTable(inputId, tableId) {
+            const input = document.getElementById(inputId);
+            if (!input) return;
+            const filter = input.value.toUpperCase();
+            const table = document.getElementById(tableId);
+            if (!table) return;
+            const tr = table.getElementsByTagName("tr");
+            for (let i = 1; i < tr.length; i++) {
+                let visible = false;
+                const tds = tr[i].getElementsByTagName("td");
+                for (let j = 0; j < tds.length; j++) {
+                    if (tds[j]) {
+                        const text = tds[j].textContent || tds[j].innerText;
+                        if (text.toUpperCase().indexOf(filter) > -1) {
+                            visible = true;
+                            break;
+                        }
+                    }
+                }
+                tr[i].style.display = visible ? "" : "none";
+            }
+        }
+    </script>
+</body>
+</html>
