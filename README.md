@@ -1,5 +1,7 @@
 # 🎓 Öğrenci Bilgi Sistemi (OBS) - İleri Programlama Projesi
 
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/zeyy-staf/obs-sistem)
+
 Bu proje, **İleri Programlama** dersi kapsamında geliştirilmiş; modern, şık ve responsive bir **Öğrenci Bilgi Sistemi (OBS)** portalıdır. Flask (Python) backend'i, SQLite/MySQL çift veritabanı desteği ve Bootstrap 5 tabanlı zenginleştirilmiş modern SaaS dashboard arayüzü ile donatılmıştır.
 
 ---
