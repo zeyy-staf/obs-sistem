@@ -1,0 +1,2185 @@
+<!DOCTYPE html>
+<html lang="tr" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Öğrenci Bilgi Sistemi (OBS) - GitHub Pages Statik Sürümü">
+    <title>Öğrenci Bilgi Sistemi | OBS Portal</title>
+    
+    <!-- Bootstrap 5 CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome Simgeleri CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        /* ==========================================================================
+           TEMA DEĞİŞKENLERİ VE TASARIM SİSTEMİ
+           ========================================================================== */
+        :root {
+            --bg-primary: #f1f5f9;
+            --bg-secondary: #ffffff;
+            --bg-card: #ffffff;
+            --border-color: #e2e8f0;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #64748b;
+            
+            --sidebar-bg: #0f172a;
+            --sidebar-hover: #1e293b;
+            --sidebar-active: #4f46e5;
+            --sidebar-text: #94a3b8;
+            --sidebar-text-active: #ffffff;
+            
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --primary-light: rgba(79, 70, 229, 0.1);
+            
+            --success: #10b981;
+            --success-light: rgba(16, 185, 129, 0.1);
+            --warning: #f59e0b;
+            --warning-light: rgba(245, 158, 11, 0.1);
+            --danger: #ef4444;
+            --danger-light: rgba(239, 68, 68, 0.1);
+            --info: #06b6d4;
+            --info-light: rgba(6, 182, 212, 0.1);
+            
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            --transition-speed: 0.25s;
+            --border-radius: 12px;
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #0b0f19;
+            --bg-secondary: #111827;
+            --bg-card: #1f2937;
+            --border-color: #374151;
+            --text-primary: #f9fafb;
+            --text-secondary: #d1d5db;
+            --text-muted: #9ca3af;
+            
+            --sidebar-bg: #030712;
+            --sidebar-hover: #111827;
+            --sidebar-active: #6366f1;
+            --sidebar-text: #9ca3af;
+            --sidebar-text-active: #f9fafb;
+            
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --primary-light: rgba(99, 102, 241, 0.15);
+            
+            --success: #34d399;
+            --success-light: rgba(52, 211, 153, 0.15);
+            --warning: #fbbf24;
+            --warning-light: rgba(251, 191, 36, 0.15);
+            --danger: #f87171;
+            --danger-light: rgba(248, 113, 113, 0.15);
+            --info: #22d3ee;
+            --info-light: rgba(34, 211, 238, 0.15);
+            
+            --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -4px rgba(0, 0, 0, 0.3);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 0;
+            transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        /* Giriş Ekranı */
+        .login-wrapper {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.15) 0%, transparent 40%),
+                        radial-gradient(circle at 90% 80%, rgba(6, 182, 212, 0.15) 0%, transparent 40%),
+                        var(--bg-primary);
+            padding: 20px;
+        }
+
+        .login-card {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 45px 40px;
+            box-shadow: var(--card-shadow);
+            width: 100%;
+            max-width: 440px;
+        }
+
+        /* Panel Düzeni */
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 270px;
+            background-color: var(--sidebar-bg);
+            color: var(--sidebar-text);
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+            border-right: 1px solid var(--border-color);
+        }
+
+        .sidebar-brand {
+            padding: 24px 30px;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--sidebar-text-active);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 20px 15px;
+            margin: 0;
+            flex-grow: 1;
+        }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 18px;
+            color: var(--sidebar-text);
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 15px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .sidebar-link:hover, .sidebar-link.active {
+            background-color: var(--sidebar-hover);
+            color: var(--sidebar-text-active);
+        }
+
+        .sidebar-link.active {
+            background-color: var(--sidebar-active);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+        }
+
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .top-navbar {
+            background-color: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            height: 70px;
+            padding: 0 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .content-body {
+            padding: 30px;
+            flex-grow: 1;
+        }
+
+        .stat-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 24px;
+            box-shadow: var(--card-shadow);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .stat-icon {
+            width: 54px;
+            height: 54px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .table-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        .table-card-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .obs-table {
+            margin: 0;
+            width: 100%;
+        }
+
+        .obs-table th {
+            background-color: rgba(0, 0, 0, 0.02);
+            color: var(--text-secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        [data-theme="dark"] .obs-table th {
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+
+        .obs-table td {
+            padding: 16px 24px;
+            vertical-align: middle;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 14px;
+        }
+
+        .grade-badge {
+            font-weight: 700;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            display: inline-block;
+            text-align: center;
+            min-width: 42px;
+        }
+        .grade-AA { background-color: var(--success-light); color: var(--success); }
+        .grade-BA { background-color: var(--success-light); color: var(--success); }
+        .grade-BB { background-color: var(--success-light); color: var(--success); }
+        .grade-CB { background-color: var(--info-light); color: var(--info); }
+        .grade-CC { background-color: var(--info-light); color: var(--info); }
+        .grade-DC { background-color: var(--warning-light); color: var(--warning); }
+        .grade-DD { background-color: var(--warning-light); color: var(--warning); }
+        .grade-FD { background-color: var(--danger-light); color: var(--danger); }
+        .grade-FF { background-color: var(--danger-light); color: var(--danger); }
+        .grade-empty { background-color: var(--border-color); color: var(--text-muted); }
+
+        .search-box-container {
+            position: relative;
+            max-width: 320px;
+            width: 100%;
+        }
+
+        .search-box-input {
+            width: 100%;
+            padding: 10px 16px 10px 40px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+
+        .search-box-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        .theme-toggle-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 18px;
+            cursor: pointer;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .theme-toggle-btn:hover {
+            background-color: var(--border-color);
+        }
+
+        .view-pane {
+            display: none;
+        }
+
+        .view-pane.active {
+            display: block;
+        }
+
+        @media (max-width: 992px) {
+            .sidebar {
+                position: fixed;
+                left: -270px;
+                top: 0;
+                bottom: 0;
+                z-index: 1010;
+                height: 100vh;
+            }
+            .sidebar.show {
+                left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- GİRİŞ EKRANI -->
+    <div id="login-section" class="view-pane active">
+        <div class="login-wrapper">
+            <div class="login-card">
+                <div class="text-center mb-2" style="font-size: 32px; font-weight: 800; color: var(--primary);">
+                    <i class="fas fa-graduation-cap"></i> OBS PORTAL
+                </div>
+                <div class="text-center text-muted mb-4" style="font-size: 14px;">GitHub Pages İnteraktif Sürümü</div>
+                
+                <div id="login-error" class="alert alert-danger d-none mb-3"></div>
+
+                <form id="login-form">
+                    <div class="mb-3">
+                        <label class="form-label font-weight-600">Kullanıcı Adı</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-transparent text-muted"><i class="fas fa-user"></i></span>
+                            <input type="text" class="form-control" id="login-username" placeholder="admin, prof_ahmet veya ogr_ali" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="form-label font-weight-600">Şifre</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-transparent text-muted"><i class="fas fa-lock"></i></span>
+                            <input type="password" class="form-control" id="login-password" placeholder="admin123, hoca123 veya ogr123" required>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary w-100 py-2" style="background-color: var(--primary); border: none;">
+                        Giriş Yap <i class="fas fa-sign-in-alt ms-2"></i>
+                    </button>
+                </form>
+                
+                <div class="mt-4 text-center">
+                    <button class="theme-toggle-btn mx-auto" onclick="toggleTheme()">
+                        <i class="fas fa-moon" id="theme-icon-login"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ANA PANEL (SIDEBAR + TOPBAR + İÇERİK) -->
+    <div id="main-section" class="view-pane">
+        <div class="app-container">
+            <!-- Sidebar -->
+            <div class="sidebar" id="sidebar">
+                <div class="sidebar-brand">
+                    <i class="fas fa-graduation-cap"></i> 
+                    <span>OBS PORTAL</span>
+                </div>
+                
+                <ul class="sidebar-menu">
+                    <li class="sidebar-item">
+                        <a onclick="switchPage('dashboard')" id="nav-dashboard" class="sidebar-link active">
+                            <i class="fas fa-chart-pie"></i><span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a onclick="switchPage('courses')" id="nav-courses" class="sidebar-link">
+                            <i class="fas fa-book-open"></i><span>Dersler</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a onclick="switchPage('grades')" id="nav-grades" class="sidebar-link">
+                            <i class="fas fa-award"></i><span>Notlar</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a onclick="switchPage('attendance')" id="nav-attendance" class="sidebar-link">
+                            <i class="fas fa-calendar-check"></i><span>Devamsızlık</span>
+                        </a>
+                    </li>
+                    
+                    <!-- Admin Menüleri -->
+                    <li class="sidebar-item mt-4 admin-only d-none">
+                        <div class="px-3 mb-2 text-uppercase text-muted" style="font-size: 11px; letter-spacing: 1px;">YÖNETİM</div>
+                    </li>
+                    <li class="sidebar-item admin-only d-none">
+                        <a onclick="switchPage('users')" id="nav-users" class="sidebar-link">
+                            <i class="fas fa-users-cog"></i><span>Kullanıcı Yönetimi</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item admin-only d-none">
+                        <a onclick="switchPage('courses_mgmt')" id="nav-courses_mgmt" class="sidebar-link">
+                            <i class="fas fa-folder-plus"></i><span>Ders Yönetimi</span>
+                        </a>
+                    </li>
+                </ul>
+                
+                <!-- Alt Bölüm -->
+                <div class="sidebar-user-section" style="padding: 20px; border-top: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.2);">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="user-avatar" id="sidebar-avatar" style="width:34px; height:34px; border-radius:50%; background:var(--primary-light); color:var(--primary); display:flex; align-items:center; justify-content:center; font-weight:700;">AD</div>
+                            <div style="min-width:0;">
+                                <div class="text-white text-truncate font-weight-600" style="font-size:13px;" id="sidebar-name">Sistem Yöneticisi</div>
+                                <div style="font-size:11px; color:var(--sidebar-text)" id="sidebar-role">Yönetici</div>
+                            </div>
+                        </div>
+                        <a onclick="logout()" class="text-danger fs-5" style="cursor: pointer;" title="Çıkış">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sağ İçerik -->
+            <div class="main-content">
+                <!-- Topbar -->
+                <div class="top-navbar">
+                    <div class="d-flex align-items-center gap-3">
+                        <button class="btn p-0 d-lg-none text-primary fs-4" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+                        <h4 class="mb-0" id="navbar-title">Genel Bakış</h4>
+                    </div>
+                    
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="search-box-container d-none d-md-block" id="topbar-search">
+                            <i class="fas fa-search search-box-icon"></i>
+                            <input type="text" class="search-box-input" id="table-search" placeholder="Tablolarda ara..." onkeyup="filterTables()">
+                        </div>
+
+                        <button class="theme-toggle-btn" onclick="toggleTheme()">
+                            <i class="fas fa-moon" id="theme-icon-main"></i>
+                        </button>
+                        
+                        <div class="border-start ps-3 d-flex align-items-center gap-2">
+                            <div class="text-end d-none d-sm-block">
+                                <div class="font-weight-600" style="font-size:14px;" id="header-name">Sistem Yöneticisi</div>
+                                <div class="text-muted" style="font-size:11px;" id="header-email">admin@obs.edu.tr</div>
+                            </div>
+                            <div class="user-avatar" id="header-avatar" style="width:40px; height:40px; border-radius:50%; background:var(--primary-light); color:var(--primary); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:16px;">AD</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gövde -->
+                <div class="content-body">
+                    <div id="alert-container"></div>
+
+                    <!-- D1. DASHBOARD VIEW -->
+                    <div id="view-dashboard" class="page-view">
+                        <div class="mb-4">
+                            <h2 id="welcome-text">Hoş Geldiniz</h2>
+                            <p class="text-muted">OBS sisteminin genel durumunu ve istatistiklerini buradan takip edebilirsiniz.</p>
+                        </div>
+                        
+                        <div class="row g-4 mb-5">
+                            <div class="col-md-3">
+                                <div class="stat-card">
+                                    <div>
+                                        <h3 id="stat-total-students">0</h3>
+                                        <p class="text-muted mb-0" style="font-size:13px; font-weight:600;">TOPLAM ÖĞRENCİ</p>
+                                    </div>
+                                    <div class="stat-icon" style="background:var(--primary-light); color:var(--primary);"><i class="fas fa-user-graduate"></i></div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stat-card">
+                                    <div>
+                                        <h3 id="stat-total-teachers">0</h3>
+                                        <p class="text-muted mb-0" style="font-size:13px; font-weight:600;">AKADEMİSYEN</p>
+                                    </div>
+                                    <div class="stat-icon" style="background:var(--info-light); color:var(--info);"><i class="fas fa-user-tie"></i></div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stat-card">
+                                    <div>
+                                        <h3 id="stat-total-courses">0</h3>
+                                        <p class="text-muted mb-0" style="font-size:13px; font-weight:600;">AKTİF DERS</p>
+                                    </div>
+                                    <div class="stat-icon" style="background:var(--warning-light); color:var(--warning);"><i class="fas fa-book"></i></div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stat-card">
+                                    <div>
+                                        <h3 id="stat-success-rate">%85.5</h3>
+                                        <p class="text-muted mb-0" style="font-size:13px; font-weight:600;">BAŞARI ORANI</p>
+                                    </div>
+                                    <div class="stat-icon" style="background:var(--success-light); color:var(--success);"><i class="fas fa-chart-line"></i></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row g-4">
+                            <!-- Bilgi Paneli -->
+                            <div class="col-lg-6">
+                                <div class="card border-0 shadow-sm p-4 h-100" style="background-color:var(--bg-card); border:1px solid var(--border-color)!important; border-radius:var(--border-radius);">
+                                    <h5 class="mb-3 text-primary"><i class="fas fa-info-circle me-2"></i> Kişisel Bilgi Paneli</h5>
+                                    <div id="personal-info-content" class="d-flex flex-column gap-3">
+                                        <!-- JS ile yüklenecek -->
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Duyurular -->
+                            <div class="col-lg-6">
+                                <div class="card border-0 shadow-sm p-4 h-100" style="background-color:var(--bg-card); border:1px solid var(--border-color)!important; border-radius:var(--border-radius);">
+                                    <h5 class="mb-3 text-warning"><i class="fas fa-bullhorn me-2"></i> Sistem Duyuruları</h5>
+                                    <div class="d-flex flex-column gap-3">
+                                        <div class="p-3 border-start border-3 border-primary" style="background:rgba(0,0,0,0.01); border-radius:4px;">
+                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                <strong>Bahar Dönemi Final Sınavları Hakkında</strong>
+                                                <span class="text-muted" style="font-size: 11px;">13.06.2026</span>
+                                            </div>
+                                            <p class="mb-0 text-muted" style="font-size: 12px;">Final sınavları programı ve sınıfları öğrenci paneli üzerinde açıklanmıştır.</p>
+                                        </div>
+                                        <div class="p-3 border-start border-3 border-success" style="background:rgba(0,0,0,0.01); border-radius:4px;">
+                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                <strong>İleri Programlama Proje Teslimi</strong>
+                                                <span class="text-muted" style="font-size: 11px;">10.06.2026</span>
+                                            </div>
+                                            <p class="mb-0 text-muted" style="font-size: 12px;">GitHub Pages ve Flask tabanlı projenizi tamamlayıp linkleri hocanıza iletiniz.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- D2. COURSES VIEW -->
+                    <div id="view-courses" class="page-view d-none">
+                        <div class="table-card">
+                            <div class="table-card-header">
+                                <h5 class="table-card-title"><i class="fas fa-list-ul me-2"></i> Dönemlik Ders Listesi</h5>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table obs-table" id="table-courses-list">
+                                    <!-- JS ile doldurulacak -->
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- D3. GRADES VIEW -->
+                    <div id="view-grades" class="page-view d-none">
+                        <!-- Akademisyen Filtre -->
+                        <div id="teacher-grade-filter" class="card border-0 shadow-sm p-4 mb-4 d-none" style="background-color:var(--bg-card); border-radius:var(--border-radius);">
+                            <h5 class="mb-3"><i class="fas fa-filter me-2"></i> Ders Seçimi</h5>
+                            <div class="row">
+                                <div class="col-md-6 col-lg-4">
+                                    <select id="grade-course-select" class="form-select" onchange="loadTeacherGradeTable()">
+                                        <!-- JS ile dolacak -->
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="table-card">
+                            <div class="table-card-header">
+                                <h5 class="table-card-title"><i class="fas fa-award me-2"></i> Not Tablosu</h5>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table obs-table" id="table-grades-list">
+                                    <!-- JS ile doldurulacak -->
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- D4. ATTENDANCE VIEW -->
+                    <div id="view-attendance" class="page-view d-none">
+                        <!-- Akademisyen Filtre -->
+                        <div id="teacher-attend-filter" class="card border-0 shadow-sm p-4 mb-4 d-none" style="background-color:var(--bg-card); border-radius:var(--border-radius);">
+                            <h5 class="mb-3"><i class="fas fa-filter me-2"></i> Ders Seçimi</h5>
+                            <div class="row">
+                                <div class="col-md-6 col-lg-4">
+                                    <select id="attend-course-select" class="form-select" onchange="loadTeacherAttendTable()">
+                                        <!-- JS ile dolacak -->
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="table-card">
+                            <div class="table-card-header">
+                                <h5 class="table-card-title"><i class="fas fa-calendar-check me-2"></i> Devamsızlık Takibi</h5>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table obs-table" id="table-attendance-list">
+                                    <!-- JS ile doldurulacak -->
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- D5. USERS MANAGEMENT (ADMIN ONLY) -->
+                    <div id="view-users" class="page-view d-none">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <ul class="nav nav-pills" id="pills-tab" role="tablist">
+                                <li class="nav-item"><button class="nav-link active me-2" onclick="switchUserTab('students')"><i class="fas fa-user-graduate me-2"></i> Öğrenciler</button></li>
+                                <li class="nav-item"><button class="nav-link" onclick="switchUserTab('teachers')"><i class="fas fa-user-tie me-2"></i> Akademisyenler</button></li>
+                            </ul>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-primary" onclick="openAddUserModal('student')"><i class="fas fa-plus me-2"></i> Öğrenci Ekle</button>
+                                <button class="btn btn-outline-primary" onclick="openAddUserModal('academician')"><i class="fas fa-plus me-2"></i> Akademisyen Ekle</button>
+                            </div>
+                        </div>
+
+                        <div class="table-card">
+                            <div class="table-card-header">
+                                <h5 class="table-card-title" id="users-table-title">Kayıtlı Öğrenciler</h5>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table obs-table" id="table-users-list">
+                                    <!-- JS ile doldurulacak -->
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- D6. COURSES MANAGEMENT (ADMIN ONLY) -->
+                    <div id="view-courses_mgmt" class="page-view d-none">
+                        <div class="row g-4">
+                            <div class="col-lg-7">
+                                <div class="table-card">
+                                    <div class="table-card-header">
+                                        <h5 class="table-card-title"><i class="fas fa-book me-2"></i> Sistemdeki Dersler</h5>
+                                    </div>
+                                    <div class="table-responsive">
+                                        <table class="table obs-table" id="table-courses-mgmt-list">
+                                            <!-- JS ile doldurulacak -->
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-lg-5">
+                                <!-- Ders Ekle -->
+                                <div class="card border-0 shadow-sm p-4 mb-4" style="background-color:var(--bg-card); border-radius:var(--border-radius); border:1px solid var(--border-color)!important;">
+                                    <h5 class="mb-3 text-primary"><i class="fas fa-plus me-2"></i> Yeni Ders Ekle</h5>
+                                    <form id="form-add-course">
+                                        <div class="row g-3">
+                                            <div class="col-6">
+                                                <label class="form-label" style="font-size:13px;">Ders Kodu</label>
+                                                <input type="text" class="form-control" id="mgmt-course-code" placeholder="Örn: BM407" required>
+                                            </div>
+                                            <div class="col-6">
+                                                <label class="form-label" style="font-size:13px;">Ders Kredisi</label>
+                                                <input type="number" class="form-control" id="mgmt-course-credits" min="1" max="10" placeholder="3" required>
+                                            </div>
+                                            <div class="col-12">
+                                                <label class="form-label" style="font-size:13px;">Ders İsmi</label>
+                                                <input type="text" class="form-control" id="mgmt-course-name" placeholder="Örn: İleri Programlama" required>
+                                            </div>
+                                            <div class="col-12">
+                                                <label class="form-label" style="font-size:13px;">Sorumlu Hoca</label>
+                                                <select id="mgmt-course-teacher" class="form-select">
+                                                    <!-- JS ile dolacak -->
+                                                </select>
+                                            </div>
+                                            <div class="col-12">
+                                                <button type="submit" class="btn btn-primary w-100">Ders Oluştur</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                                
+                                <!-- Hoca Ata -->
+                                <div class="card border-0 shadow-sm p-4 mb-4" style="background-color:var(--bg-card); border-radius:var(--border-radius); border:1px solid var(--border-color)!important;">
+                                    <h5 class="mb-3 text-info"><i class="fas fa-user-tie me-2"></i> Derse Hoca Ata</h5>
+                                    <form id="form-assign-teacher">
+                                        <div class="row g-3">
+                                            <div class="col-12">
+                                                <label class="form-label" style="font-size:13px;">Ders Seçin</label>
+                                                <select id="assign-course-select" class="form-select" required></select>
+                                            </div>
+                                            <div class="col-12">
+                                                <label class="form-label" style="font-size:13px;">Atanacak Hoca</label>
+                                                <select id="assign-teacher-select" class="form-select" required></select>
+                                            </div>
+                                            <div class="col-12">
+                                                <button type="submit" class="btn btn-info w-100 text-white">Hocayı Ata</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                                
+                                <!-- Öğrenciyi Derse Kaydet -->
+                                <div class="card border-0 shadow-sm p-4" style="background-color:var(--bg-card); border-radius:var(--border-radius); border:1px solid var(--border-color)!important;">
+                                    <h5 class="mb-3 text-success"><i class="fas fa-user-plus me-2"></i> Öğrenciyi Derse Kaydet</h5>
+                                    <form id="form-enroll-student">
+                                        <div class="row g-3">
+                                            <div class="col-12">
+                                                <label class="form-label" style="font-size:13px;">Ders Seçin</label>
+                                                <select id="enroll-course-select" class="form-select" required></select>
+                                            </div>
+                                            <div class="col-12">
+                                                <label class="form-label" style="font-size:13px;">Öğrenci Seçin</label>
+                                                <select id="enroll-student-select" class="form-select" required></select>
+                                            </div>
+                                            <div class="col-12">
+                                                <button type="submit" class="btn btn-success w-100">Öğrenciyi Kaydet</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALLAR -->
+
+    <!-- Akademisyen Not Giriş Modalı -->
+    <div class="modal fade" id="gradeModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-edit me-2"></i> Not Güncelleme</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="form-grade-update">
+                    <input type="hidden" id="grade-sc-id">
+                    <div class="modal-body">
+                        <div class="mb-3"><strong>Öğrenci:</strong> <span id="grade-student-name"></span></div>
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <label class="form-label">Vize Notu (%30)</label>
+                                <input type="number" class="form-control" id="grade-midterm" min="0" max="100" step="0.01">
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">Final Notu (%40)</label>
+                                <input type="number" class="form-control" id="grade-final" min="0" max="100" step="0.01">
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">Proje Notu (%20)</label>
+                                <input type="number" class="form-control" id="grade-project" min="0" max="100" step="0.01">
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">Sunum Notu (%10)</label>
+                                <input type="number" class="form-control" id="grade-presentation" min="0" max="100" step="0.01">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                        <button type="submit" class="btn btn-primary">Kaydet</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Akademisyen Devamsızlık Modalı -->
+    <div class="modal fade" id="attendanceModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-calendar-check me-2"></i> Haftalık Devamsızlık Yönetimi</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="form-attendance-update">
+                    <input type="hidden" id="attend-sc-id">
+                    <div class="modal-body">
+                        <div class="mb-3"><strong>Öğrenci:</strong> <span id="attend-student-name"></span></div>
+                        <p class="text-muted" style="font-size:13px;">İşaretli olan haftalar derse <b>Gelinmiş</b> sayılır.</p>
+                        <div class="row g-3" id="attendance-checkboxes-grid">
+                            <!-- JS ile oluşturulacak -->
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                        <button type="submit" class="btn btn-primary">Kaydet</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Öğrenci Profil Kartı AJAX Simülasyonu -->
+    <div class="modal fade" id="profileModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-user-graduate me-2"></i> Öğrenci Akademik Profili</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="d-flex align-items-center gap-3 mb-4">
+                        <div class="user-avatar" style="width:60px; height:60px; font-size:24px; border-radius:50%; background:var(--primary-light); color:var(--primary); display:flex; align-items:center; justify-content:center; font-weight:700;" id="prof-avatar">ST</div>
+                        <div>
+                            <h4 class="mb-0" id="prof-name">Öğrenci Adı</h4>
+                            <div class="text-muted" style="font-size:13px;"><span id="prof-number">2026001</span> | <span id="prof-email">mail@obs.edu.tr</span></div>
+                        </div>
+                        <div class="ms-auto text-end">
+                            <div class="text-muted" style="font-size:11px; text-transform:uppercase;">Ortalama</div>
+                            <h2 class="text-success mb-0 font-weight-800" id="prof-gpa">0.00</h2>
+                        </div>
+                    </div>
+                    
+                    <div class="row g-4">
+                        <div class="col-md-7 border-end">
+                            <h6 class="text-primary mb-3"><i class="fas fa-book me-2"></i> Not Bilgileri</h6>
+                            <table class="table table-sm text-start" style="font-size:13px;">
+                                <thead><tr><th>Ders</th><th>Kredi</th><th>Harf Notu</th></tr></thead>
+                                <tbody id="prof-courses-body"></tbody>
+                            </table>
+                        </div>
+                        <div class="col-md-5">
+                            <h6 class="text-warning mb-3"><i class="fas fa-calendar-check me-2"></i> Devamsızlık Durumu</h6>
+                            <table class="table table-sm text-start" style="font-size:13px;">
+                                <thead><tr><th>Ders</th><th>Devamsızlık</th></tr></thead>
+                                <tbody id="prof-attendance-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Kullanıcı Ekleme Modalı -->
+    <div class="modal fade" id="userAddModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="userAddModalTitle">Kullanıcı Ekle</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="form-add-user">
+                    <input type="hidden" id="add-user-type">
+                    <div class="modal-body">
+                        <div class="row g-3">
+                            <div class="col-12" id="add-student-number-div">
+                                <label class="form-label">Öğrenci Numarası</label>
+                                <input type="text" class="form-control" id="add-student-number" placeholder="2026011">
+                            </div>
+                            <div class="col-4" id="add-title-div">
+                                <label class="form-label">Ünvan</label>
+                                <select class="form-select" id="add-title">
+                                    <option value="Prof. Dr.">Prof. Dr.</option>
+                                    <option value="Doç. Dr.">Doç. Dr.</option>
+                                    <option value="Dr. Öğr. Üyesi">Dr. Öğr. Üyesi</option>
+                                    <option value="Öğr. Gör.">Öğr. Gör.</option>
+                                </select>
+                            </div>
+                            <div class="col-4" id="add-firstname-div">
+                                <label class="form-label">Adı</label>
+                                <input type="text" class="form-control" id="add-first-name" required>
+                            </div>
+                            <div class="col-4" id="add-lastname-div">
+                                <label class="form-label">Soyadı</label>
+                                <input type="text" class="form-control" id="add-last-name" required>
+                            </div>
+                            <div class="col-12" id="add-dept-div">
+                                <label class="form-label">Bölüm / Departman</label>
+                                <input type="text" class="form-control" id="add-department" placeholder="Yazılım Mühendisliği">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Kullanıcı Adı</label>
+                                <input type="text" class="form-control" id="add-username" required>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">E-posta Adresi</label>
+                                <input type="email" class="form-control" id="add-email" required>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Giriş Şifresi</label>
+                                <input type="password" class="form-control" id="add-password" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                        <button type="submit" class="btn btn-primary">Kaydet</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- VERİTABANI VE YÖNLENDİRME MANTIĞI -->
+    <script>
+        // -------------------------------------------------------------
+        // MOCK VERİ TABANI - LOCALSTORAGE ÜZERİNDE TUTULUR
+        // -------------------------------------------------------------
+        
+        function initLocalStorage() {
+            if (!localStorage.getItem('obs_users')) {
+                // Varsayılan Kullanıcılar (Şifreler düz metindir)
+                const users = [
+                    { id: 1, username: 'admin', password: 'admin123', role: 'admin', email: 'admin@obs.edu.tr', full_name: 'Sistem Yöneticisi' },
+                    { id: 2, username: 'prof_ahmet', password: 'hoca123', role: 'academician', email: 'ahmet.yilmaz@obs.edu.tr', full_name: 'Prof. Dr. Ahmet Yılmaz' },
+                    { id: 3, username: 'doc_elif', password: 'hoca123', role: 'academician', email: 'elif.kaya@obs.edu.tr', full_name: 'Doç. Dr. Elif Kaya' },
+                    { id: 4, username: 'dr_mehmet', password: 'hoca123', role: 'academician', email: 'mehmet.demir@obs.edu.tr', full_name: 'Dr. Öğr. Üyesi Mehmet Demir' },
+                    { id: 5, username: 'ogr_ali', password: 'ogr123', role: 'student', email: 'ali.ozturk@ogr.obs.edu.tr', full_name: 'Ali Öztürk' },
+                    { id: 6, username: 'ogr_ayse', password: 'ogr123', role: 'student', email: 'ayse.yilmaz@ogr.obs.edu.tr', full_name: 'Ayşe Yılmaz' },
+                    { id: 7, username: 'ogr_can', password: 'ogr123', role: 'student', email: 'can.demir@ogr.obs.edu.tr', full_name: 'Can Demir' },
+                    { id: 8, username: 'ogr_fatma', password: 'ogr123', role: 'student', email: 'fatma.sahin@ogr.obs.edu.tr', full_name: 'Fatma Şahin' },
+                    { id: 9, username: 'ogr_burak', password: 'ogr123', role: 'student', email: 'burak.aslan@ogr.obs.edu.tr', full_name: 'Burak Aslan' },
+                    { id: 10, username: 'ogr_zeynep', password: 'ogr123', role: 'student', email: 'zeynep.celik@ogr.obs.edu.tr', full_name: 'Zeynep Çelik' },
+                    { id: 11, username: 'ogr_mert', password: 'ogr123', role: 'student', email: 'mert.koc@ogr.obs.edu.tr', full_name: 'Mert Koç' },
+                    { id: 12, username: 'ogr_gamze', password: 'ogr123', role: 'student', email: 'gamze.turan@ogr.obs.edu.tr', full_name: 'Gamze Turan' },
+                    { id: 13, username: 'ogr_emre', password: 'ogr123', role: 'student', email: 'emre.kara@ogr.obs.edu.tr', full_name: 'Emre Kara' },
+                    { id: 14, username: 'ogr_selin', password: 'ogr123', role: 'student', email: 'selin.yildiz@ogr.obs.edu.tr', full_name: 'Selin Yıldız' }
+                ];
+                localStorage.setItem('obs_users', JSON.stringify(users));
+            }
+
+            if (!localStorage.getItem('obs_academicians')) {
+                const academicians = [
+                    { id: 1, user_id: 2, title: 'Prof. Dr.', first_name: 'Ahmet', last_name: 'Yılmaz', department: 'Bilgisayar Mühendisliği' },
+                    { id: 2, user_id: 3, title: 'Doç. Dr.', first_name: 'Elif', last_name: 'Kaya', department: 'Yazılım Mühendisliği' },
+                    { id: 3, user_id: 4, title: 'Dr. Öğr. Üyesi', first_name: 'Mehmet', last_name: 'Demir', department: 'Bilişim Sistemleri Mühendisliği' }
+                ];
+                localStorage.setItem('obs_academicians', JSON.stringify(academicians));
+            }
+
+            if (!localStorage.getItem('obs_students')) {
+                const students = [
+                    { id: 1, user_id: 5, student_number: '2026001', first_name: 'Ali', last_name: 'Öztürk', gpa: 3.25 },
+                    { id: 2, user_id: 6, student_number: '2026002', first_name: 'Ayşe', last_name: 'Yılmaz', gpa: 3.80 },
+                    { id: 3, user_id: 7, student_number: '2026003', first_name: 'Can', last_name: 'Demir', gpa: 2.45 },
+                    { id: 4, user_id: 8, student_number: '2026004', first_name: 'Fatma', last_name: 'Şahin', gpa: 3.10 },
+                    { id: 5, user_id: 9, student_number: '2026005', first_name: 'Burak', last_name: 'Aslan', gpa: 2.90 },
+                    { id: 6, user_id: 10, student_number: '2026006', first_name: 'Zeynep', last_name: 'Çelik', gpa: 3.65 },
+                    { id: 7, user_id: 11, student_number: '2026007', first_name: 'Mert', last_name: 'Koç', gpa: 2.10 },
+                    { id: 8, user_id: 12, student_number: '2026008', first_name: 'Gamze', last_name: 'Turan', gpa: 3.40 },
+                    { id: 9, user_id: 13, student_number: '2026009', first_name: 'Emre', last_name: 'Kara', gpa: 2.75 },
+                    { id: 10, user_id: 14, student_number: '2026010', first_name: 'Selin', last_name: 'Yıldız', gpa: 3.95 }
+                ];
+                localStorage.setItem('obs_students', JSON.stringify(students));
+            }
+
+            if (!localStorage.getItem('obs_courses')) {
+                const courses = [
+                    { id: 1, course_code: 'BM101', course_name: 'Programlamaya Giriş', credits: 4, academician_id: 1 },
+                    { id: 2, course_code: 'BM202', course_name: 'Veri Yapıları ve Algoritmalar', credits: 4, academician_id: 1 },
+                    { id: 3, course_code: 'BM303', course_name: 'Veritabanı Yönetim Sistemleri', credits: 3, academician_id: 2 },
+                    { id: 4, course_code: 'BM404', course_name: 'Yazılım Mühendisliği', credits: 3, academician_id: 2 },
+                    { id: 5, course_code: 'BM205', course_name: 'Nesne Yönelimli Programlama', credits: 4, academician_id: 3 },
+                    { id: 6, course_code: 'BM306', course_name: 'Web Tasarımı ve Geliştirme', credits: 3, academician_id: 3 },
+                    { id: 7, course_code: 'BM407', course_name: 'İleri Programlama', credits: 3, academician_id: 1 },
+                    { id: 8, course_code: 'BM308', course_name: 'İşletim Sistemleri', credits: 3, academician_id: 2 },
+                    { id: 9, course_code: 'BM109', course_name: 'Matematik I', credits: 4, academician_id: 3 },
+                    { id: 10, course_code: 'BM210', course_name: 'Lineer Cebir', credits: 3, academician_id: 1 }
+                ];
+                localStorage.setItem('obs_courses', JSON.stringify(courses));
+            }
+
+            if (!localStorage.getItem('obs_student_courses')) {
+                const sc = [
+                    // Öğrenci 1
+                    { id: 1, student_id: 1, course_id: 1 },
+                    { id: 2, student_id: 1, course_id: 3 },
+                    { id: 3, student_id: 1, course_id: 7 },
+                    { id: 4, student_id: 1, course_id: 9 },
+                    // Öğrenci 2
+                    { id: 5, student_id: 2, course_id: 1 },
+                    { id: 6, student_id: 2, course_id: 3 },
+                    { id: 7, student_id: 2, course_id: 7 },
+                    { id: 8, student_id: 2, course_id: 8 },
+                    // Öğrenci 3
+                    { id: 9, student_id: 3, course_id: 2 },
+                    { id: 10, student_id: 3, course_id: 5 },
+                    { id: 11, student_id: 3, course_id: 9 },
+                    { id: 12, student_id: 3, course_id: 10 }
+                ];
+                // Kalan öğrencilere de rastgele ders atayalım (Canlılık için)
+                let scId = 13;
+                for (let s = 4; s <= 10; s++) {
+                    const courses = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+                    // Rastgele 3 ders ata
+                    for (let i = 0; i < 3; i++) {
+                        const idx = Math.floor(Math.random() * courses.length);
+                        const cId = courses.splice(idx, 1)[0];
+                        sc.push({ id: scId++, student_id: s, course_id: cId });
+                    }
+                }
+                localStorage.setItem('obs_student_courses', JSON.stringify(sc));
+            }
+
+            if (!localStorage.getItem('obs_grades')) {
+                const grades = [];
+                const sc = JSON.parse(localStorage.getItem('obs_student_courses'));
+                
+                sc.forEach(item => {
+                    const midterm = Math.floor(Math.random() * 50) + 50; // 50-100 arası
+                    const final = Math.floor(Math.random() * 50) + 50;
+                    const project = Math.floor(Math.random() * 40) + 60;
+                    const presentation = Math.floor(Math.random() * 40) + 60;
+                    
+                    const avg = Math.round((midterm * 0.3 + final * 0.4 + project * 0.2 + presentation * 0.1) * 100) / 100;
+                    let letter = 'FF';
+                    if (avg >= 90) letter = 'AA';
+                    else if (avg >= 85) letter = 'BA';
+                    else if (avg >= 80) letter = 'BB';
+                    else if (avg >= 75) letter = 'CB';
+                    else if (avg >= 70) letter = 'CC';
+                    else if (avg >= 65) letter = 'DC';
+                    else if (avg >= 60) letter = 'DD';
+                    else if (avg >= 50) letter = 'FD';
+
+                    grades.push({
+                        id: item.id,
+                        student_course_id: item.id,
+                        midterm,
+                        final,
+                        project,
+                        presentation,
+                        average: avg,
+                        letter_grade: letter
+                    });
+                });
+                localStorage.setItem('obs_grades', JSON.stringify(grades));
+            }
+
+            if (!localStorage.getItem('obs_attendance')) {
+                const attendance = [];
+                const sc = JSON.parse(localStorage.getItem('obs_student_courses'));
+                
+                sc.forEach(item => {
+                    for (let w = 1; w <= 14; w++) {
+                        // Rastgele devamsızlık ata (%10 ihtimalle absent)
+                        const status = Math.random() > 0.1 ? 'Present' : 'Absent';
+                        attendance.push({
+                            id: `${item.id}_${w}`,
+                            student_course_id: item.id,
+                            week_number: w,
+                            status
+                        });
+                    }
+                });
+                localStorage.setItem('obs_attendance', JSON.stringify(attendance));
+            }
+        }
+
+        // -------------------------------------------------------------
+        // SAYFA YÖNLENDİRME (ROUTING) VE KULLANICI DETAYLARI
+        // -------------------------------------------------------------
+        let sessionUser = null;
+        let activePage = 'dashboard';
+        let activeUserTab = 'students';
+
+        document.getElementById('login-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const username = document.getElementById('login-username').value.trim();
+            const password = document.getElementById('login-password').value.trim();
+            
+            const users = JSON.parse(localStorage.getItem('obs_users'));
+            const user = users.find(u => u.username === username && u.password === password);
+            
+            if (user) {
+                sessionUser = user;
+                
+                // Rol detaylarını ekle
+                if (user.role === 'student') {
+                    const students = JSON.parse(localStorage.getItem('obs_students'));
+                    const student = students.find(s => s.user_id === user.id);
+                    if (student) {
+                        sessionUser.student_id = student.id;
+                        sessionUser.student_number = student.student_number;
+                        sessionUser.full_name = `${student.first_name} ${student.last_name}`;
+                        sessionUser.gpa = student.gpa;
+                    }
+                } else if (user.role === 'academician') {
+                    const teachers = JSON.parse(localStorage.getItem('obs_academicians'));
+                    const teacher = teachers.find(t => t.user_id === user.id);
+                    if (teacher) {
+                        sessionUser.academician_id = teacher.id;
+                        sessionUser.full_name = `${teacher.title} ${teacher.first_name} ${teacher.last_name}`;
+                        sessionUser.department = teacher.department;
+                    }
+                }
+                
+                document.getElementById('login-section').classList.add('d-none');
+                document.getElementById('main-section').classList.remove('d-none');
+                
+                showNotification(`Hoş geldiniz, ${sessionUser.full_name}!`, 'success');
+                
+                // Arayüz menülerini rol ayarlarına göre göster
+                setupSidebarMenus();
+                updateProfileHeaders();
+                switchPage('dashboard');
+            } else {
+                const errDiv = document.getElementById('login-error');
+                errDiv.innerText = 'Hatalı kullanıcı adı veya şifre!';
+                errDiv.classList.remove('d-none');
+            }
+        });
+
+        function logout() {
+            sessionUser = null;
+            document.getElementById('main-section').classList.add('d-none');
+            document.getElementById('login-section').classList.remove('d-none');
+            document.getElementById('login-username').value = '';
+            document.getElementById('login-password').value = '';
+            document.getElementById('login-error').classList.add('d-none');
+        }
+
+        function setupSidebarMenus() {
+            const adminItems = document.querySelectorAll('.admin-only');
+            if (sessionUser.role === 'admin') {
+                adminItems.forEach(item => item.classList.remove('d-none'));
+            } else {
+                adminItems.forEach(item => item.classList.add('d-none'));
+            }
+        }
+
+        function updateProfileHeaders() {
+            document.getElementById('sidebar-name').innerText = sessionUser.full_name;
+            document.getElementById('sidebar-role').innerText = sessionUser.role === 'admin' ? 'Yönetici' : (sessionUser.role === 'academician' ? 'Akademisyen' : 'Öğrenci');
+            document.getElementById('sidebar-avatar').innerText = sessionUser.username.substring(0,2).toUpperCase();
+            
+            document.getElementById('header-name').innerText = sessionUser.full_name;
+            document.getElementById('header-email').innerText = sessionUser.email;
+            document.getElementById('header-avatar').innerText = sessionUser.username.substring(0,2).toUpperCase();
+        }
+
+        function switchPage(page) {
+            activePage = page;
+            
+            // Linklerin aktiflik durumlarını güncelle
+            document.querySelectorAll('.sidebar-link').forEach(link => link.classList.remove('active'));
+            const activeLink = document.getElementById(`nav-${page}`);
+            if (activeLink) activeLink.classList.add('active');
+            
+            // Tüm viewları gizle ve hedefi göster
+            document.querySelectorAll('.page-view').forEach(view => view.classList.add('d-none'));
+            const targetView = document.getElementById(`view-${page}`);
+            if (targetView) targetView.classList.remove('d-none');
+
+            // Başlık Güncellemesi
+            const titles = {
+                dashboard: 'Genel Bakış (Dashboard)',
+                courses: 'Ders Listeleri',
+                grades: 'Not Bilgileri',
+                attendance: 'Devamsızlık Takibi',
+                users: 'Kullanıcı İşlemleri',
+                courses_mgmt: 'Ders Yapılandırması'
+            };
+            document.getElementById('navbar-title').innerText = titles[page] || 'OBS Portal';
+
+            // Sayfaya özel veri çekme işlemleri
+            loadPageData(page);
+            
+            // Mobilde sidebar'ı kapat
+            const sidebar = document.getElementById('sidebar');
+            if (sidebar) sidebar.classList.remove('show');
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('show');
+        }
+
+        // -------------------------------------------------------------
+        // SAYFALARIN VERİLERİNİ DİNAMİK YÜKLEME (AJAX SİMÜLASYONU)
+        // -------------------------------------------------------------
+        
+        function loadPageData(page) {
+            const students = JSON.parse(localStorage.getItem('obs_students'));
+            const academicians = JSON.parse(localStorage.getItem('obs_academicians'));
+            const courses = JSON.parse(localStorage.getItem('obs_courses'));
+            const grades = JSON.parse(localStorage.getItem('obs_grades'));
+            
+            if (page === 'dashboard') {
+                // İstatistik kartları
+                document.getElementById('stat-total-students').innerText = students.length;
+                document.getElementById('stat-total-teachers').innerText = academicians.length;
+                document.getElementById('stat-total-courses').innerText = courses.length;
+                
+                // Başarı Oranı
+                const passing = grades.filter(g => g.letter_grade && g.letter_grade !== 'FF' && g.letter_grade !== 'FD').length;
+                const total = grades.filter(g => g.letter_grade).length;
+                const pct = total > 0 ? Math.round((passing * 100 / total) * 10) / 10 : 0.0;
+                document.getElementById('stat-success-rate').innerText = `%${pct}`;
+
+                // Kişisel Panel
+                const infoBody = document.getElementById('personal-info-content');
+                if (sessionUser.role === 'student') {
+                    const mySc = JSON.parse(localStorage.getItem('obs_student_courses')).filter(item => item.student_id === sessionUser.student_id);
+                    const myAtt = JSON.parse(localStorage.getItem('obs_attendance')).filter(item => {
+                        return mySc.some(sc => sc.id === item.student_course_id) && item.status === 'Absent';
+                    });
+                    
+                    infoBody.innerHTML = `
+                        <div class="d-flex justify-content-between border-bottom pb-2">
+                            <span class="text-muted">Öğrenci Numarası:</span>
+                            <span class="fw-bold">${sessionUser.student_number}</span>
+                        </div>
+                        <div class="d-flex justify-content-between border-bottom pb-2">
+                            <span class="text-muted">Genel Not Ortalaması (GNO):</span>
+                            <span class="fw-bold text-success">${sessionUser.gpa || '0.00'} / 4.00</span>
+                        </div>
+                        <div class="d-flex justify-content-between border-bottom pb-2">
+                            <span class="text-muted">Kayıtlı Olduğunuz Ders:</span>
+                            <span class="fw-bold">${mySc.length} Ders</span>
+                        </div>
+                        <div class="d-flex justify-content-between pb-1">
+                            <span class="text-muted">Toplam Devamsızlık (Gün):</span>
+                            <span class="fw-bold ${myAtt.length > 4 ? 'text-danger' : 'text-muted'}">${myAtt.length} Gün</span>
+                        </div>
+                    `;
+                } else if (sessionUser.role === 'academician') {
+                    const myCourses = courses.filter(c => c.academician_id === sessionUser.academician_id);
+                    const sc = JSON.parse(localStorage.getItem('obs_student_courses'));
+                    // Öğretmenin sorumlu olduğu toplam tekil öğrenci sayısını bul
+                    const myStudentIds = new Set(
+                        sc.filter(item => myCourses.some(c => c.id === item.course_id)).map(item => item.student_id)
+                    );
+                    
+                    infoBody.innerHTML = `
+                        <div class="d-flex justify-content-between border-bottom pb-2">
+                            <span class="text-muted">Bağlı Olduğunuz Bölüm:</span>
+                            <span class="fw-bold">${sessionUser.department}</span>
+                        </div>
+                        <div class="d-flex justify-content-between border-bottom pb-2">
+                            <span class="text-muted">Verdiğiniz Toplam Ders:</span>
+                            <span class="fw-bold">${myCourses.length} Ders</span>
+                        </div>
+                        <div class="d-flex justify-content-between pb-1">
+                            <span class="text-muted">Sorumlu Olduğunuz Toplam Öğrenci:</span>
+                            <span class="fw-bold">${myStudentIds.size} Öğrenci</span>
+                        </div>
+                    `;
+                } else {
+                    infoBody.innerHTML = `
+                        <div class="text-center py-4">
+                            <i class="fas fa-user-shield fs-1 text-danger mb-3"></i>
+                            <h6>Yönetici Modu Aktif</h6>
+                            <p class="text-muted" style="font-size:13px;">Tüm kullanıcıları, dersleri, hocaları ve kayıtları bu panel üzerinden tam yetkiyle yönetebilirsiniz.</p>
+                        </div>
+                    `;
+                }
+            } 
+            
+            else if (page === 'courses') {
+                const table = document.getElementById('table-courses-list');
+                let html = `<thead><tr><th>Ders Kodu</th><th>Ders Adı</th><th>Kredi</th><th>Sorumlu Akademisyen</th></tr></thead><tbody>`;
+                
+                let myCourses = [];
+                if (sessionUser.role === 'admin') {
+                    myCourses = courses;
+                } else if (sessionUser.role === 'academician') {
+                    myCourses = courses.filter(c => c.academician_id === sessionUser.academician_id);
+                } else {
+                    const mySc = JSON.parse(localStorage.getItem('obs_student_courses')).filter(item => item.student_id === sessionUser.student_id);
+                    myCourses = courses.filter(c => mySc.some(sc => sc.course_id === c.id));
+                }
+
+                myCourses.forEach(c => {
+                    const teacher = academicians.find(a => a.id === c.academician_id);
+                    const teacherName = teacher ? `${teacher.title} ${teacher.first_name} ${teacher.last_name}` : '<span class="text-muted">Atanmadı</span>';
+                    html += `
+                        <tr>
+                            <td><strong class="text-primary">${c.course_code}</strong></td>
+                            <td>${c.course_name}</td>
+                            <td>${c.credits} Kredi</td>
+                            <td>${teacherName}</td>
+                        </tr>
+                    `;
+                });
+                if (myCourses.length === 0) {
+                    html += `<tr><td colspan="4" class="text-center text-muted">Kayıtlı ders bulunamadı.</td></tr>`;
+                }
+                html += `</tbody>`;
+                table.innerHTML = html;
+            } 
+            
+            else if (page === 'grades') {
+                const table = document.getElementById('table-grades-list');
+                const filterSec = document.getElementById('teacher-grade-filter');
+                
+                if (sessionUser.role === 'student') {
+                    filterSec.classList.add('d-none');
+                    let html = `<thead><tr><th>Ders Kodu</th><th>Ders Adı</th><th>Vize (%30)</th><th>Final (%40)</th><th>Proje (%20)</th><th>Sunum (%10)</th><th>Ortalama</th><th>Harf Notu</th></tr></thead><tbody>`;
+                    
+                    const mySc = JSON.parse(localStorage.getItem('obs_student_courses')).filter(item => item.student_id === sessionUser.student_id);
+                    mySc.forEach(item => {
+                        const course = courses.find(c => c.id === item.course_id);
+                        const grade = grades.find(g => g.student_course_id === item.id) || {};
+                        const midterm = grade.midterm !== undefined ? grade.midterm : '-';
+                        const final = grade.final !== undefined ? grade.final : '-';
+                        const project = grade.project !== undefined ? grade.project : '-';
+                        const presentation = grade.presentation !== undefined ? grade.presentation : '-';
+                        const avg = grade.average !== undefined ? grade.average : '-';
+                        const letter = grade.letter_grade ? `<span class="grade-badge grade-${grade.letter_grade}">${grade.letter_grade}</span>` : '<span class="grade-badge grade-empty">-</span>';
+                        
+                        html += `
+                            <tr>
+                                <td><strong class="text-primary">${course.course_code}</strong></td>
+                                <td>${course.course_name}</td>
+                                <td>${midterm}</td>
+                                <td>${final}</td>
+                                <td>${project}</td>
+                                <td>${presentation}</td>
+                                <td><strong>${avg}</strong></td>
+                                <td>${letter}</td>
+                            </tr>
+                        `;
+                    });
+                    if (mySc.length === 0) {
+                        html += `<tr><td colspan="8" class="text-center text-muted">Kayıtlı ders bulunamadı.</td></tr>`;
+                    }
+                    html += `</tbody>`;
+                    table.innerHTML = html;
+                } else if (sessionUser.role === 'academician') {
+                    filterSec.classList.remove('d-none');
+                    // Ders dropdown'ını doldur
+                    const select = document.getElementById('grade-course-select');
+                    const myCourses = courses.filter(c => c.academician_id === sessionUser.academician_id);
+                    
+                    let options = '<option value="">-- Ders Seçin --</option>';
+                    myCourses.forEach(c => {
+                        options += `<option value="${c.id}">${c.course_code} - ${c.course_name}</option>`;
+                    });
+                    select.innerHTML = options;
+                    table.innerHTML = '<tbody><tr><td class="text-center text-muted py-4">Lütfen listeden bir ders seçiniz.</td></tr></tbody>';
+                } else {
+                    // Admin için tüm notlar
+                    filterSec.classList.add('d-none');
+                    let html = `<thead><tr><th>Öğrenci No</th><th>Öğrenci Adı</th><th>Ders Kodu</th><th>Ders Adı</th><th>Ortalama</th><th>Harf Notu</th></tr></thead><tbody>`;
+                    const sc = JSON.parse(localStorage.getItem('obs_student_courses'));
+                    const allStudents = JSON.parse(localStorage.getItem('obs_students'));
+                    
+                    grades.forEach(g => {
+                        const enroll = sc.find(item => item.id === g.student_course_id);
+                        if (!enroll) return;
+                        const student = allStudents.find(s => s.id === enroll.student_id);
+                        const course = courses.find(c => c.id === enroll.course_id);
+                        const letter = g.letter_grade ? `<span class="grade-badge grade-${g.letter_grade}">${g.letter_grade}</span>` : '<span class="grade-badge grade-empty">-</span>';
+                        
+                        html += `
+                            <tr>
+                                <td>${student.student_number}</td>
+                                <td>${student.first_name} ${student.last_name}</td>
+                                <td><strong>${course.course_code}</strong></td>
+                                <td>${course.course_name}</td>
+                                <td><strong>${g.average !== null ? g.average : '-'}</strong></td>
+                                <td>${letter}</td>
+                            </tr>
+                        `;
+                    });
+                    html += `</tbody>`;
+                    table.innerHTML = html;
+                }
+            } 
+            
+            else if (page === 'attendance') {
+                const table = document.getElementById('table-attendance-list');
+                const filterSec = document.getElementById('teacher-attend-filter');
+                
+                if (sessionUser.role === 'student') {
+                    filterSec.classList.add('d-none');
+                    let html = `<thead><tr><th>Ders Kodu</th><th>Ders Adı</th><th>Toplam Hafta</th><th>Devamsızlık</th><th>Durum</th></tr></thead><tbody>`;
+                    
+                    const mySc = JSON.parse(localStorage.getItem('obs_student_courses')).filter(item => item.student_id === sessionUser.student_id);
+                    const att = JSON.parse(localStorage.getItem('obs_attendance'));
+                    
+                    mySc.forEach(item => {
+                        const course = courses.find(c => c.id === item.course_id);
+                        const myWeeks = att.filter(a => a.student_course_id === item.id);
+                        const absentCount = myWeeks.filter(a => a.status === 'Absent').length;
+                        
+                        const pct = myWeeks.length > 0 ? Math.round(((myWeeks.length - absentCount) * 100 / myWeeks.length)) : 100;
+                        const badge = pct >= 70 ? `<span class="badge bg-success-light text-success">%${pct} Devam</span>` : `<span class="badge bg-danger-light text-danger">%${pct} Devam (Kaldı)</span>`;
+                        
+                        html += `
+                            <tr>
+                                <td><strong class="text-primary">${course.course_code}</strong></td>
+                                <td>${course.course_name}</td>
+                                <td>${myWeeks.length} Hafta</td>
+                                <td class="${absentCount > 4 ? 'text-danger fw-bold' : ''}">${absentCount} Hafta (Gün)</td>
+                                <td>${badge}</td>
+                            </tr>
+                        `;
+                    });
+                    html += `</tbody>`;
+                    table.innerHTML = html;
+                } else if (sessionUser.role === 'academician') {
+                    filterSec.classList.remove('d-none');
+                    const select = document.getElementById('attend-course-select');
+                    const myCourses = courses.filter(c => c.academician_id === sessionUser.academician_id);
+                    
+                    let options = '<option value="">-- Ders Seçin --</option>';
+                    myCourses.forEach(c => {
+                        options += `<option value="${c.id}">${c.course_code} - ${c.course_name}</option>`;
+                    });
+                    select.innerHTML = options;
+                    table.innerHTML = '<tbody><tr><td class="text-center text-muted py-4">Lütfen listeden bir ders seçiniz.</td></tr></tbody>';
+                } else {
+                    // Admin
+                    filterSec.classList.add('d-none');
+                    let html = `<thead><tr><th>Öğrenci No</th><th>Öğrenci Adı</th><th>Ders Kodu</th><th>Ders Adı</th><th>Devamsız Hafta</th></tr></thead><tbody>`;
+                    const sc = JSON.parse(localStorage.getItem('obs_student_courses'));
+                    const allStudents = JSON.parse(localStorage.getItem('obs_students'));
+                    const att = JSON.parse(localStorage.getItem('obs_attendance'));
+                    
+                    sc.forEach(item => {
+                        const student = allStudents.find(s => s.id === item.student_id);
+                        const course = courses.find(c => c.id === item.course_id);
+                        const absentCount = att.filter(a => a.student_course_id === item.id && a.status === 'Absent').length;
+                        
+                        html += `
+                            <tr>
+                                <td>${student.student_number}</td>
+                                <td>${student.first_name} ${student.last_name}</td>
+                                <td><strong>${course.course_code}</strong></td>
+                                <td>${course.course_name}</td>
+                                <td class="${absentCount > 4 ? 'text-danger fw-bold' : ''}">${absentCount} Hafta</td>
+                            </tr>
+                        `;
+                    });
+                    html += `</tbody>`;
+                    table.innerHTML = html;
+                }
+            } 
+            
+            else if (page === 'users') {
+                switchUserTab(activeUserTab);
+            } 
+            
+            else if (page === 'courses_mgmt') {
+                loadCoursesMgmtData();
+            }
+        }
+
+        // -------------------------------------------------------------
+        // AKADEMİSYEN: NOT GİRİŞ TABLOSU
+        // -------------------------------------------------------------
+        function loadTeacherGradeTable() {
+            const courseId = parseInt(document.getElementById('grade-course-select').value);
+            const table = document.getElementById('table-grades-list');
+            if (!courseId) {
+                table.innerHTML = '<tbody><tr><td class="text-center text-muted py-4">Lütfen listeden bir ders seçiniz.</td></tr></tbody>';
+                return;
+            }
+            
+            const sc = JSON.parse(localStorage.getItem('obs_student_courses')).filter(item => item.course_id === courseId);
+            const students = JSON.parse(localStorage.getItem('obs_students'));
+            const grades = JSON.parse(localStorage.getItem('obs_grades'));
+            
+            let html = `<thead><tr><th>Öğrenci No</th><th>Adı Soyadı</th><th>Vize (%30)</th><th>Final (%40)</th><th>Proje (%20)</th><th>Sunum (%10)</th><th>Ortalama</th><th>Harf Notu</th><th>İşlem</th></tr></thead><tbody>`;
+            
+            sc.forEach(item => {
+                const s = students.find(student => student.id === item.student_id);
+                const g = grades.find(grade => grade.student_course_id === item.id) || {};
+                
+                const midterm = g.midterm !== undefined ? g.midterm : '-';
+                const final = g.final !== undefined ? g.final : '-';
+                const project = g.project !== undefined ? g.project : '-';
+                const presentation = g.presentation !== undefined ? g.presentation : '-';
+                const avg = g.average !== undefined ? g.average : '-';
+                const letter = g.letter_grade ? `<span class="grade-badge grade-${g.letter_grade}">${g.letter_grade}</span>` : '<span class="grade-badge grade-empty">-</span>';
+                
+                html += `
+                    <tr>
+                        <td>${s.student_number}</td>
+                        <td><a onclick="simulateProfileAJAX(${s.id})" style="cursor:pointer; text-decoration:none;" class="fw-bold text-primary">${s.first_name} ${s.last_name}</a></td>
+                        <td>${midterm}</td>
+                        <td>${final}</td>
+                        <td>${project}</td>
+                        <td>${presentation}</td>
+                        <td><strong>${avg}</strong></td>
+                        <td>${letter}</td>
+                        <td>
+                            <button class="btn btn-sm btn-primary" onclick="openEditGradeModal(${item.id}, '${s.first_name} ${s.last_name}', '${g.midterm || ''}', '${g.final || ''}', '${g.project || ''}', '${g.presentation || ''}')">
+                                <i class="fas fa-edit"></i> Not Gir
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+            if (sc.length === 0) {
+                html += `<tr><td colspan="9" class="text-center text-muted">Bu derse kayıtlı öğrenci bulunamadı.</td></tr>`;
+            }
+            html += `</tbody>`;
+            table.innerHTML = html;
+        }
+
+        function openEditGradeModal(scId, name, midterm, final, project, presentation) {
+            document.getElementById('grade-sc-id').value = scId;
+            document.getElementById('grade-student-name').innerText = name;
+            document.getElementById('grade-midterm').value = midterm;
+            document.getElementById('grade-final').value = final;
+            document.getElementById('grade-project').value = project;
+            document.getElementById('grade-presentation').value = presentation;
+            
+            const modal = new bootstrap.Modal(document.getElementById('gradeModal'));
+            modal.show();
+        }
+
+        document.getElementById('form-grade-update').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const scId = parseInt(document.getElementById('grade-sc-id').value);
+            const m = parseFloat(document.getElementById('grade-midterm').value);
+            const f = parseFloat(document.getElementById('grade-final').value);
+            const p = parseFloat(document.getElementById('grade-project').value) || 0.0;
+            const pr = parseFloat(document.getElementById('grade-presentation').value) || 0.0;
+            
+            if (isNaN(m) || isNaN(f)) {
+                alert('Vize ve Final notları zorunludur.');
+                return;
+            }
+            
+            const avg = Math.round((m * 0.3 + f * 0.4 + p * 0.2 + pr * 0.1) * 100) / 100;
+            let letter = 'FF';
+            if (avg >= 90) letter = 'AA';
+            else if (avg >= 85) letter = 'BA';
+            else if (avg >= 80) letter = 'BB';
+            else if (avg >= 75) letter = 'CB';
+            else if (avg >= 70) letter = 'CC';
+            else if (avg >= 65) letter = 'DC';
+            else if (avg >= 60) letter = 'DD';
+            else if (avg >= 50) letter = 'FD';
+
+            const grades = JSON.parse(localStorage.getItem('obs_grades'));
+            const idx = grades.findIndex(g => g.student_course_id === scId);
+            const newGrade = { student_course_id: scId, midterm: m, final: f, project: p, presentation: pr, average: avg, letter_grade: letter };
+            
+            if (idx > -1) {
+                grades[idx] = newGrade;
+            } else {
+                grades.push(newGrade);
+            }
+            localStorage.setItem('obs_grades', JSON.stringify(grades));
+            
+            // Öğrencinin GNO'sunu yeniden hesapla
+            const sc = JSON.parse(localStorage.getItem('obs_student_courses')).find(item => item.id === scId);
+            recalculateGpa(sc.student_id);
+
+            bootstrap.Modal.getInstance(document.getElementById('gradeModal')).hide();
+            showNotification('Notlar başarıyla güncellendi.', 'success');
+            loadTeacherGradeTable();
+        });
+
+        function recalculateGpa(studentId) {
+            const sc = JSON.parse(localStorage.getItem('obs_student_courses')).filter(item => item.student_id === studentId);
+            const grades = JSON.parse(localStorage.getItem('obs_grades'));
+            const courses = JSON.parse(localStorage.getItem('obs_courses'));
+            
+            const pointsMap = { 'AA':4.0, 'BA':3.5, 'BB':3.0, 'CB':2.5, 'CC':2.0, 'DC':1.5, 'DD':1.0, 'FD':0.5, 'FF':0.0 };
+            
+            let totalPoints = 0;
+            let totalCredits = 0;
+            
+            sc.forEach(item => {
+                const g = grades.find(grade => grade.student_course_id === item.id);
+                const c = courses.find(course => course.id === item.course_id);
+                if (g && g.letter_grade && pointsMap[g.letter_grade] !== undefined) {
+                    totalPoints += pointsMap[g.letter_grade] * c.credits;
+                    totalCredits += c.credits;
+                }
+            });
+            
+            const gpa = totalCredits > 0 ? Math.round((totalPoints / totalCredits) * 100) / 100 : 0.00;
+            
+            const students = JSON.parse(localStorage.getItem('obs_students'));
+            const sIdx = students.findIndex(s => s.id === studentId);
+            if (sIdx > -1) {
+                students[sIdx].gpa = gpa.toFixed(2);
+                localStorage.setItem('obs_students', JSON.stringify(students));
+            }
+        }
+
+        // -------------------------------------------------------------
+        // AKADEMİSYEN: DEVAMSIZLIK TABLOSU
+        // -------------------------------------------------------------
+        function loadTeacherAttendTable() {
+            const courseId = parseInt(document.getElementById('attend-course-select').value);
+            const table = document.getElementById('table-attendance-list');
+            if (!courseId) {
+                table.innerHTML = '<tbody><tr><td class="text-center text-muted py-4">Lütfen listeden bir ders seçiniz.</td></tr></tbody>';
+                return;
+            }
+            
+            const sc = JSON.parse(localStorage.getItem('obs_student_courses')).filter(item => item.course_id === courseId);
+            const students = JSON.parse(localStorage.getItem('obs_students'));
+            const att = JSON.parse(localStorage.getItem('obs_attendance'));
+            
+            let html = `<thead><tr><th>Öğrenci No</th><th>Adı Soyadı</th><th>Toplam Hafta</th><th>Gelmeme Hafta</th><th>Devam Yüzdesi</th><th>İşlem</th></tr></thead><tbody>`;
+            
+            sc.forEach(item => {
+                const s = students.find(student => student.id === item.student_id);
+                const myWeeks = att.filter(a => a.student_course_id === item.id);
+                const absentCount = myWeeks.filter(a => a.status === 'Absent').length;
+                
+                const pct = myWeeks.length > 0 ? Math.round(((myWeeks.length - absentCount) * 100 / myWeeks.length)) : 100;
+                const badge = pct >= 70 ? `<span class="badge bg-success-light text-success">%${pct}</span>` : `<span class="badge bg-danger-light text-danger">%${pct} (Kaldı)</span>`;
+                
+                html += `
+                    <tr>
+                        <td>${s.student_number}</td>
+                        <td>${s.first_name} ${s.last_name}</td>
+                        <td>${myWeeks.length} Hafta</td>
+                        <td class="${absentCount > 4 ? 'text-danger fw-bold' : ''}">${absentCount} Hafta</td>
+                        <td>${badge}</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary" onclick="openEditAttendModal(${item.id}, '${s.first_name} ${s.last_name}')">
+                                <i class="fas fa-calendar-alt"></i> Devamsızlık Yönet
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+            if (sc.length === 0) {
+                html += `<tr><td colspan="6" class="text-center text-muted">Bu derse kayıtlı öğrenci bulunamadı.</td></tr>`;
+            }
+            html += `</tbody>`;
+            table.innerHTML = html;
+        }
+
+        function openEditAttendModal(scId, name) {
+            document.getElementById('attend-sc-id').value = scId;
+            document.getElementById('attend-student-name').innerText = name;
+            
+            const att = JSON.parse(localStorage.getItem('obs_attendance')).filter(a => a.student_course_id === scId);
+            const grid = document.getElementById('attendance-checkboxes-grid');
+            
+            let html = '';
+            for (let w = 1; w <= 14; w++) {
+                const record = att.find(a => a.week_number === w);
+                const isChecked = record ? record.status === 'Present' : true;
+                html += `
+                    <div class="col-6 col-md-3">
+                        <div class="form-check form-switch p-3 border rounded">
+                            <input class="form-check-input ms-0 me-2" type="checkbox" id="week_${w}" value="Present" ${isChecked ? 'checked' : ''}>
+                            <label class="form-check-label fw-bold" for="week_${w}">${w}. Hafta</label>
+                        </div>
+                    </div>
+                `;
+            }
+            grid.innerHTML = html;
+            
+            const modal = new bootstrap.Modal(document.getElementById('attendanceModal'));
+            modal.show();
+        }
+
+        document.getElementById('form-attendance-update').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const scId = parseInt(document.getElementById('attend-sc-id').value);
+            const att = JSON.parse(localStorage.getItem('obs_attendance'));
+            
+            for (let w = 1; w <= 14; w++) {
+                const box = document.getElementById(`week_${w}`);
+                const status = box.checked ? 'Present' : 'Absent';
+                const idx = att.findIndex(a => a.student_course_id === scId && a.week_number === w);
+                
+                if (idx > -1) {
+                    att[idx].status = status;
+                } else {
+                    att.push({ id: `${scId}_${w}`, student_course_id: scId, week_number: w, status });
+                }
+            }
+            localStorage.setItem('obs_attendance', JSON.stringify(att));
+            
+            bootstrap.Modal.getInstance(document.getElementById('attendanceModal')).hide();
+            showNotification('Devamsızlık kayıtları güncellendi.', 'success');
+            loadTeacherAttendTable();
+        });
+
+        // -------------------------------------------------------------
+        // AKADEMİSYEN: ÖĞRENCİ DETAY PROFILLERI (AJAX SİMÜLASYONU)
+        // -------------------------------------------------------------
+        function simulateProfileAJAX(studentId) {
+            const students = JSON.parse(localStorage.getItem('obs_students'));
+            const s = students.find(student => student.id === studentId);
+            if (!s) return;
+            
+            const users = JSON.parse(localStorage.getItem('obs_users'));
+            const u = users.find(user => user.id === s.user_id);
+            
+            document.getElementById('prof-name').innerText = `${s.first_name} ${s.last_name}`;
+            document.getElementById('prof-number').innerText = s.student_number;
+            document.getElementById('prof-email').innerText = u.email;
+            document.getElementById('prof-gpa').innerText = s.gpa;
+            document.getElementById('prof-avatar').innerText = `${s.first_name[0]}${s.last_name[0]}`.toUpperCase();
+            
+            // Notları yükle
+            const sc = JSON.parse(localStorage.getItem('obs_student_courses')).filter(item => item.student_id === studentId);
+            const courses = JSON.parse(localStorage.getItem('obs_courses'));
+            const grades = JSON.parse(localStorage.getItem('obs_grades'));
+            
+            let coursesHtml = '';
+            sc.forEach(item => {
+                const c = courses.find(course => course.id === item.course_id);
+                const g = grades.find(grade => grade.student_course_id === item.id) || {};
+                const letter = g.letter_grade ? `<span class="grade-badge grade-${g.letter_grade}">${g.letter_grade}</span>` : '<span class="grade-badge grade-empty">-</span>';
+                coursesHtml += `
+                    <tr>
+                        <td><strong>${c.course_code}</strong> - ${c.course_name}</td>
+                        <td>${c.credits}</td>
+                        <td>${letter}</td>
+                    </tr>
+                `;
+            });
+            document.getElementById('prof-courses-body').innerHTML = coursesHtml || '<tr><td colspan="3" class="text-center text-muted">Ders kaydı bulunamadı.</td></tr>';
+            
+            // Devamsızlıkları yükle
+            const att = JSON.parse(localStorage.getItem('obs_attendance'));
+            let attHtml = '';
+            sc.forEach(item => {
+                const c = courses.find(course => course.id === item.course_id);
+                const count = att.filter(a => a.student_course_id === item.id && a.status === 'Absent').length;
+                attHtml += `
+                    <tr>
+                        <td><strong>${c.course_code}</strong></td>
+                        <td class="${count > 4 ? 'text-danger fw-bold' : ''}">${count} Gün</td>
+                    </tr>
+                `;
+            });
+            document.getElementById('prof-attendance-body').innerHTML = attHtml || '<tr><td colspan="2" class="text-center text-muted">Ders kaydı bulunamadı.</td></tr>';
+
+            const modal = new bootstrap.Modal(document.getElementById('profileModal'));
+            modal.show();
+        }
+
+        // -------------------------------------------------------------
+        // ADMIN: KULLANICI TABLOLARINI GEZME
+        // -------------------------------------------------------------
+        function switchUserTab(tab) {
+            activeUserTab = tab;
+            document.querySelectorAll('#pills-tab button').forEach(b => b.classList.remove('active'));
+            
+            const table = document.getElementById('table-users-list');
+            const title = document.getElementById('users-table-title');
+            
+            if (tab === 'students') {
+                document.querySelectorAll('#pills-tab button')[0].classList.add('active');
+                title.innerText = 'Kayıtlı Öğrenciler';
+                
+                const students = JSON.parse(localStorage.getItem('obs_students'));
+                const users = JSON.parse(localStorage.getItem('obs_users'));
+                
+                let html = `<thead><tr><th>Öğrenci No</th><th>Kullanıcı Adı</th><th>Adı Soyadı</th><th>E-posta</th><th>GNO</th><th class="text-end">İşlem</th></tr></thead><tbody>`;
+                students.forEach(s => {
+                    const u = users.find(user => user.id === s.user_id) || {};
+                    html += `
+                        <tr>
+                            <td><strong>${s.student_number}</strong></td>
+                            <td>${u.username || '-'}</td>
+                            <td>${s.first_name} ${s.last_name}</td>
+                            <td>${u.email || '-'}</td>
+                            <td><span class="badge bg-success-light text-success">${s.gpa}</span></td>
+                            <td class="text-end">
+                                <button class="btn btn-sm btn-outline-danger" onclick="deleteUser(${u.id})"><i class="fas fa-trash"></i> Sil</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                html += `</tbody>`;
+                table.innerHTML = html;
+            } else {
+                document.querySelectorAll('#pills-tab button')[1].classList.add('active');
+                title.innerText = 'Kayıtlı Akademisyenler';
+                
+                const academicians = JSON.parse(localStorage.getItem('obs_academicians'));
+                const users = JSON.parse(localStorage.getItem('obs_users'));
+                
+                let html = `<thead><tr><th>Ünvan Adı Soyadı</th><th>Kullanıcı Adı</th><th>E-posta</th><th>Departman</th><th class="text-end">İşlem</th></tr></thead><tbody>`;
+                academicians.forEach(a => {
+                    const u = users.find(user => user.id === a.user_id) || {};
+                    html += `
+                        <tr>
+                            <td><strong>${a.title} ${a.first_name} ${a.last_name}</strong></td>
+                            <td>${u.username || '-'}</td>
+                            <td>${u.email || '-'}</td>
+                            <td>${a.department}</td>
+                            <td class="text-end">
+                                <button class="btn btn-sm btn-outline-danger" onclick="deleteUser(${u.id})"><i class="fas fa-trash"></i> Sil</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                html += `</tbody>`;
+                table.innerHTML = html;
+            }
+        }
+
+        function openAddUserModal(type) {
+            document.getElementById('add-user-type').value = type;
+            document.getElementById('form-add-user').reset();
+            
+            if (type === 'student') {
+                document.getElementById('userAddModalTitle').innerText = 'Yeni Öğrenci Ekle';
+                document.getElementById('add-student-number-div').classList.remove('d-none');
+                document.getElementById('add-title-div').classList.add('d-none');
+                document.getElementById('add-dept-div').classList.add('d-none');
+                document.getElementById('add-student-number').required = true;
+            } else {
+                document.getElementById('userAddModalTitle').innerText = 'Yeni Akademisyen Ekle';
+                document.getElementById('add-student-number-div').classList.add('d-none');
+                document.getElementById('add-title-div').classList.remove('d-none');
+                document.getElementById('add-dept-div').classList.remove('d-none');
+                document.getElementById('add-student-number').required = false;
+            }
+            
+            const modal = new bootstrap.Modal(document.getElementById('userAddModal'));
+            modal.show();
+        }
+
+        document.getElementById('form-add-user').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const type = document.getElementById('add-user-type').value;
+            const username = document.getElementById('add-username').value.trim();
+            const email = document.getElementById('add-email').value.trim();
+            const password = document.getElementById('add-password').value.trim();
+            const firstName = document.getElementById('add-first-name').value.trim();
+            const lastName = document.getElementById('add-last-name').value.trim();
+            
+            const users = JSON.parse(localStorage.getItem('obs_users'));
+            if (users.some(u => u.username === username || u.email === email)) {
+                alert('Bu kullanıcı adı veya e-posta zaten kullanılıyor!');
+                return;
+            }
+            
+            const nextUserId = Math.max(...users.map(u => u.id)) + 1;
+            users.push({ id: nextUserId, username, password, role: type, email });
+            localStorage.setItem('obs_users', JSON.stringify(users));
+            
+            if (type === 'student') {
+                const studentNumber = document.getElementById('add-student-number').value.trim();
+                const students = JSON.parse(localStorage.getItem('obs_students'));
+                if (students.some(s => s.student_number === studentNumber)) {
+                    alert('Bu öğrenci numarası zaten tanımlı!');
+                    return;
+                }
+                const nextId = Math.max(...students.map(s => s.id)) + 1;
+                students.push({ id: nextId, user_id: nextUserId, student_number: studentNumber, first_name: firstName, last_name: lastName, gpa: '0.00' });
+                localStorage.setItem('obs_students', JSON.stringify(students));
+                showNotification('Öğrenci başarıyla eklendi.', 'success');
+            } else {
+                const title = document.getElementById('add-title').value;
+                const dept = document.getElementById('add-department').value.trim();
+                const teachers = JSON.parse(localStorage.getItem('obs_academicians'));
+                const nextId = Math.max(...teachers.map(t => t.id)) + 1;
+                teachers.push({ id: nextId, user_id: nextUserId, title, first_name: firstName, last_name: lastName, department: dept });
+                localStorage.setItem('obs_academicians', JSON.stringify(teachers));
+                showNotification('Akademisyen başarıyla eklendi.', 'success');
+            }
+            
+            bootstrap.Modal.getInstance(document.getElementById('userAddModal')).hide();
+            switchUserTab(activeUserTab);
+        });
+
+        function deleteUser(userId) {
+            if (userId === 1) {
+                alert('Ana yönetici hesabı silinemez!');
+                return;
+            }
+            if (!confirm('Kullanıcıyı ve ilgili tüm verileri silmek istediğinizden emin misiniz?')) return;
+            
+            let users = JSON.parse(localStorage.getItem('obs_users'));
+            const user = users.find(u => u.id === userId);
+            if (!user) return;
+            
+            users = users.filter(u => u.id !== userId);
+            localStorage.setItem('obs_users', JSON.stringify(users));
+            
+            if (user.role === 'student') {
+                let students = JSON.parse(localStorage.getItem('obs_students'));
+                const s = students.find(item => item.user_id === userId);
+                if (s) {
+                    students = students.filter(item => item.user_id !== userId);
+                    localStorage.setItem('obs_students', JSON.stringify(students));
+                    
+                    // Ders kayıtlarını sil
+                    let sc = JSON.parse(localStorage.getItem('obs_student_courses'));
+                    const myScIds = sc.filter(item => item.student_id === s.id).map(item => item.id);
+                    sc = sc.filter(item => item.student_id !== s.id);
+                    localStorage.setItem('obs_student_courses', JSON.stringify(sc));
+                    
+                    // Not ve devamsızlıkları sil
+                    let grades = JSON.parse(localStorage.getItem('obs_grades'));
+                    grades = grades.filter(g => !myScIds.includes(g.student_course_id));
+                    localStorage.setItem('obs_grades', JSON.stringify(grades));
+                    
+                    let att = JSON.parse(localStorage.getItem('obs_attendance'));
+                    att = att.filter(a => !myScIds.includes(a.student_course_id));
+                    localStorage.setItem('obs_attendance', JSON.stringify(att));
+                }
+            } else if (user.role === 'academician') {
+                let teachers = JSON.parse(localStorage.getItem('obs_academicians'));
+                const t = teachers.find(item => item.user_id === userId);
+                if (t) {
+                    teachers = teachers.filter(item => item.user_id !== userId);
+                    localStorage.setItem('obs_academicians', JSON.stringify(teachers));
+                    
+                    // Derslerin hocasını boşa çıkar
+                    let courses = JSON.parse(localStorage.getItem('obs_courses'));
+                    courses.forEach(c => {
+                        if (c.academician_id === t.id) c.academician_id = null;
+                    });
+                    localStorage.setItem('obs_courses', JSON.stringify(courses));
+                }
+            }
+            
+            showNotification('Kullanıcı başarıyla silindi.', 'success');
+            switchUserTab(activeUserTab);
+        }
+
+        // -------------------------------------------------------------
+        // ADMIN: DERS YÖNETİMİ
+        // -------------------------------------------------------------
+        function loadCoursesMgmtData() {
+            const courses = JSON.parse(localStorage.getItem('obs_courses'));
+            const teachers = JSON.parse(localStorage.getItem('obs_academicians'));
+            const students = JSON.parse(localStorage.getItem('obs_students'));
+            
+            // Dersler Listesi
+            const table = document.getElementById('table-courses-mgmt-list');
+            let html = `<thead><tr><th>Ders Kodu</th><th>Ders Adı</th><th>Kredi</th><th>Hocası</th><th class="text-end">İşlem</th></tr></thead><tbody>`;
+            courses.forEach(c => {
+                const t = teachers.find(item => item.id === c.academician_id);
+                const tName = t ? `${t.title} ${t.first_name} ${t.last_name}` : '<span class="text-muted">Atanmadı</span>';
+                html += `
+                    <tr>
+                        <td><strong class="text-primary">${c.course_code}</strong></td>
+                        <td>${c.course_name}</td>
+                        <td>${c.credits}</td>
+                        <td>${tName}</td>
+                        <td class="text-end">
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteCourse(${c.id})"><i class="fas fa-trash-alt"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+            html += `</tbody>`;
+            table.innerHTML = html;
+            
+            // Ders Ekleme Seçenekleri
+            let teacherOptions = '<option value="">Atama Yapma</option>';
+            teachers.forEach(t => {
+                teacherOptions += `<option value="${t.id}">${t.title} ${t.first_name} ${t.last_name}</option>`;
+            });
+            document.getElementById('mgmt-course-teacher').innerHTML = teacherOptions;
+            
+            // Form Seçeneklerini Doldur
+            let courseOptions = '<option value="">-- Ders Seçiniz --</option>';
+            courses.forEach(c => {
+                courseOptions += `<option value="${c.id}">${c.course_code} - ${c.course_name}</option>`;
+            });
+            document.getElementById('assign-course-select').innerHTML = courseOptions;
+            document.getElementById('enroll-course-select').innerHTML = courseOptions;
+            
+            let teacherAssignOptions = '<option value="">Hoca Atamasını Kaldır</option>';
+            teachers.forEach(t => {
+                teacherAssignOptions += `<option value="${t.id}">${t.title} ${t.first_name} ${t.last_name}</option>`;
+            });
+            document.getElementById('assign-teacher-select').innerHTML = teacherAssignOptions;
+            
+            let studentOptions = '<option value="">-- Öğrenci Seçiniz --</option>';
+            students.forEach(s => {
+                studentOptions += `<option value="${s.id}">${s.student_number} - ${s.first_name} ${s.last_name}</option>`;
+            });
+            document.getElementById('enroll-student-select').innerHTML = studentOptions;
+        }
+
+        document.getElementById('form-add-course').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const code = document.getElementById('mgmt-course-code').value.trim().toUpperCase();
+            const name = document.getElementById('mgmt-course-name').value.trim();
+            const credits = parseInt(document.getElementById('mgmt-course-credits').value);
+            const teacherId = document.getElementById('mgmt-course-teacher').value;
+            
+            const courses = JSON.parse(localStorage.getItem('obs_courses'));
+            if (courses.some(c => c.course_code === code)) {
+                alert('Bu ders kodu zaten tanımlı!');
+                return;
+            }
+            
+            const nextId = Math.max(...courses.map(c => c.id)) + 1;
+            courses.push({
+                id: nextId,
+                course_code: code,
+                course_name: name,
+                credits,
+                academician_id: teacherId ? parseInt(teacherId) : null
+            });
+            localStorage.setItem('obs_courses', JSON.stringify(courses));
+            
+            showNotification('Yeni ders başarıyla oluşturuldu.', 'success');
+            document.getElementById('form-add-course').reset();
+            loadCoursesMgmtData();
+        });
+
+        document.getElementById('form-assign-teacher').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const cId = parseInt(document.getElementById('assign-course-select').value);
+            const tId = document.getElementById('assign-teacher-select').value;
+            
+            const courses = JSON.parse(localStorage.getItem('obs_courses'));
+            const idx = courses.findIndex(c => c.id === cId);
+            if (idx > -1) {
+                courses[idx].academician_id = tId ? parseInt(tId) : null;
+                localStorage.setItem('obs_courses', JSON.stringify(courses));
+                showNotification('Dersin hoca ataması güncellendi.', 'success');
+                loadCoursesMgmtData();
+            }
+        });
+
+        document.getElementById('form-enroll-student').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const cId = parseInt(document.getElementById('enroll-course-select').value);
+            const sId = parseInt(document.getElementById('enroll-student-select').value);
+            
+            const sc = JSON.parse(localStorage.getItem('obs_student_courses'));
+            if (sc.some(item => item.student_id === sId && item.course_id === cId)) {
+                alert('Öğrenci bu derse zaten kayıtlı!');
+                return;
+            }
+            
+            const nextId = Math.max(...sc.map(item => item.id)) + 1;
+            sc.push({ id: nextId, student_id: sId, course_id: cId });
+            localStorage.setItem('obs_student_courses', JSON.stringify(sc));
+            
+            // Boş not ve devamsızlık kayıtlarını oluştur
+            const grades = JSON.parse(localStorage.getItem('obs_grades'));
+            grades.push({ id: nextId, student_course_id: nextId });
+            localStorage.setItem('obs_grades', JSON.stringify(grades));
+            
+            const att = JSON.parse(localStorage.getItem('obs_attendance'));
+            for (let w = 1; w <= 14; w++) {
+                att.push({ id: `${nextId}_${w}`, student_course_id: nextId, week_number: w, status: 'Present' });
+            }
+            localStorage.setItem('obs_attendance', JSON.stringify(att));
+            
+            showNotification('Öğrenci derse başarıyla kaydedildi.', 'success');
+            loadCoursesMgmtData();
+        });
+
+        function deleteCourse(courseId) {
+            if (!confirm('Dersi silmek istediğinizden emin misiniz? (Öğrenci kayıtları ve notlar da silinecektir.)')) return;
+            
+            let courses = JSON.parse(localStorage.getItem('obs_courses'));
+            courses = courses.filter(c => c.id !== courseId);
+            localStorage.setItem('obs_courses', JSON.stringify(courses));
+            
+            // Kayıtları, notları sil
+            let sc = JSON.parse(localStorage.getItem('obs_student_courses'));
+            const myScIds = sc.filter(item => item.course_id === courseId).map(item => item.id);
+            
+            sc = sc.filter(item => item.course_id !== courseId);
+            localStorage.setItem('obs_student_courses', JSON.stringify(sc));
+            
+            let grades = JSON.parse(localStorage.getItem('obs_grades'));
+            grades = grades.filter(g => !myScIds.includes(g.student_course_id));
+            localStorage.setItem('obs_grades', JSON.stringify(grades));
+            
+            let att = JSON.parse(localStorage.getItem('obs_attendance'));
+            att = att.filter(a => !myScIds.includes(a.student_course_id));
+            localStorage.setItem('obs_attendance', JSON.stringify(att));
+            
+            showNotification('Ders silindi.', 'success');
+            loadCoursesMgmtData();
+        }
+
+        // -------------------------------------------------------------
+        // GENEL YARDIMCI FONKSİYONLAR
+        // -------------------------------------------------------------
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            
+            const icons = ['theme-icon-login', 'theme-icon-main'];
+            icons.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.className = newTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+            });
+        }
+
+        function showNotification(message, type = 'success') {
+            const container = document.getElementById('alert-container');
+            const id = 'alert_' + Date.now();
+            
+            container.innerHTML = `
+                <div id="${id}" class="alert alert-${type} alert-dismissible fade show shadow border-0" role="alert" style="position:fixed; top:20px; right:20px; z-index:2050; min-width:300px; border-radius:10px;">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} fs-5"></i>
+                        <div>${message}</div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+            
+            setTimeout(() => {
+                const alertEl = document.getElementById(id);
+                if (alertEl) {
+                    const bsAlert = new bootstrap.Alert(alertEl);
+                    bsAlert.close();
+                }
+            }, 3000);
+        }
+
+        function filterTables() {
+            const filter = document.getElementById('table-search').value.toUpperCase();
+            const views = ['courses', 'grades', 'attendance', 'users', 'courses_mgmt'];
+            
+            views.forEach(v => {
+                const pane = document.getElementById(`view-${v}`);
+                if (!pane.classList.contains('d-none')) {
+                    const table = pane.querySelector('.obs-table');
+                    if (!table) return;
+                    const tr = table.getElementsByTagName("tr");
+                    for (let i = 1; i < tr.length; i++) {
+                        let visible = false;
+                        const tds = tr[i].getElementsByTagName("td");
+                        for (let j = 0; j < tds.length; j++) {
+                            if (tds[j]) {
+                                const txt = tds[j].textContent || tds[j].innerText;
+                                if (txt.toUpperCase().indexOf(filter) > -1) {
+                                    visible = true;
+                                    break;
+                                }
+                            }
+                        }
+                        tr[i].style.display = visible ? "" : "none";
+                    }
+                }
+            });
+        }
+
+        // Başlangıç Kurulumları
+        window.addEventListener('load', () => {
+            initLocalStorage();
+        });
+    </script>
+</body>
+</html>
